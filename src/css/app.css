@@ -1,0 +1,40 @@
+/* app global css */
+html {
+  height: 100%;
+  box-sizing: border-box;
+  color: #2c3e50;
+}
+body,
+#q-app{
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+  font-family: 'Roboto', '-apple-system', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+}
+
+/* 默认滚动条 样式 -------------------------------------------------------------------------------- */
+/*  滚动条整体部分 */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    background-color: transparent;
+}
+/* 滚动条里面的小方块 */
+::-webkit-scrollbar-thumb {
+    display: block;
+    min-height: 5px;
+    min-width: 5px;
+    border-radius: 5px;
+    background-color: rgba(97, 97, 97, .2)
+}
+/* 滚动条 悬浮 */
+::-webkit-scrollbar-thumb:hover {
+    display: block;
+    min-height: 5px;
+    min-width: 5px;
+    border-radius: 5px;
+    background-color: rgba(97, 97, 97, .3)
+}

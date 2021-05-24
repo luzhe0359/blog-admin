@@ -1,0 +1,189 @@
+<template>
+
+  <div class="flex justify-center items-center q-electron-drag" style="height: 100%">
+    <div class="row base-card-shadow electron-hide" style="width: 60vw;min-width: 300px">
+      <div class="col-6 flex justify-center items-center " v-show="$q.screen.gt.sm">
+        <q-skeleton type="text" height="70%" width="50%" v-if="!isLottieF" />
+        <lottie-web-cimo align="right" style="height: 70%" :path="defaultOptions.path" @isLottieFinish="handleFinish" />
+      </div>
+      <q-separator vertical inset v-if="$q.screen.gt.sm" />
+      <div class="col flex justify-center items-center">
+        <q-card square style="min-width: 290px;height: 100%; width: 60%;" class="no-shadow">
+          <q-card-section align="center">
+            <h3 class="text-uppercase">zugelu</h3>
+            <!-- 用户名 -->
+            <q-input class="logon-input" clearable standout="bg-cyan text-white" bottom-slots v-model="username" label="账号" debounce='500' lazy-rules :rules="[
+                  val => (val && val.length > 0) || '请输入账号。',
+                  val => (val.length >= 6 && val.length <= 12) || '请输入 6-12 位账号。',
+                ]">
+              <template v-slot:prepend>
+                <q-icon name="account_circle" />
+              </template>
+            </q-input>
+            <!-- 密码 -->
+            <q-input class="logon-input" standout="bg-cyan text-white" bottom-slots v-model="password" label="密码" :type="isPwd ? 'password' : 'text'" hint="" debounce='200' lazy-rules :rules="[
+                  val => (val && val.length > 0) || '请输入密码。',
+                  val => (val.length >= 8 && val.length <= 16) || '请输入 8-16 位账号。',
+                  passwordStrengthCheck
+                ]">
+              <template v-slot:prepend>
+                <q-icon name="vpn_key" />
+              </template>
+              <template v-slot:append>
+                <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd" />
+              </template>
+            </q-input>
+
+            <!-- 登录按钮 -->
+            <q-btn :loading="loading" class="logon-btn bg-logon-card-input" text-color="white" unelevated label="" style="font-size: large;" @click="logon">登 录 系 统
+            </q-btn>
+            <div class="row justify-between" style="margin-bottom: 20px;">
+              <q-btn flat label="忘记密码" />
+              <q-btn outline label="我要注册" />
+            </div>
+            <!-- <p class="text-grey" align="left">账号2 ：test &nbsp;&nbsp;&nbsp;&nbsp;密码均为空</p> -->
+          </q-card-section>
+        </q-card>
+      </div>
+    </div>
+
+    <!-- electron 登录 -->
+    <div class="row electron-only q-electron-drag" style="width: 100vw;min-width: 300px;background: rgba(255,255,255,0);">
+
+      <div class="col flex justify-center items-center" v-show="$q.screen.gt.sm">
+        <q-skeleton type="text" height="100%" width="50%" v-if="!isLottieF" />
+        <lottie-web-cimo align="right" style="height: 70%" :path="defaultOptions.path" @isLottieFinish="handleFinish" />
+      </div>
+      <q-separator vertical inset v-if="$q.screen.gt.sm" />
+
+      <div class="col flex justify-center items-center">
+
+        <q-card square style="min-width: 290px;height: 100%; width: 60%;" class="no-shadow">
+          <q-card-section align="center">
+            <h3 class="text-uppercase">zugelu</h3>
+            <!-- 用户名 -->
+            <q-input class="logon-input q-electron-drag--exception" clearable standout="bg-cyan text-white" bottom-slots v-model.trim="username" label="账号" debounce='500' lazy-rules :rules="[
+                  val => (val && val.length > 0) || '请输入账号。',
+                  val => (val.length >= 6 && val.length <= 12) || '请输入 6-12账号。',
+                ]">
+              <template v-slot:prepend>
+                <q-icon name="account_circle" />
+              </template>
+            </q-input>
+            <!-- 密码 -->
+            <q-input class="logon-input q-electron-drag--exception" standout="bg-cyan text-white" bottom-slots v-model.trim="password" label="密码" :type="isPwd ? 'password' : 'text'" hint="">
+              <template v-slot:prepend>
+                <q-icon name="vpn_key" />
+              </template>
+              <template v-slot:append>
+                <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd" />
+              </template>
+            </q-input>
+
+            <!-- 登录按钮 -->
+            <q-btn :loading="loading" class="logon-btn bg-logon-card-input" text-color="white" unelevated label="" style="font-size: large;" @click="logon">登 录 系 统
+            </q-btn>
+            <div class="row justify-between" style="margin-bottom: 20px;">
+              <q-btn flat label="忘记密码" />
+              <q-btn outline label="我要注册" />
+            </div>
+            <p class="text-grey" align="left">账号2 ：test &nbsp;&nbsp;&nbsp;&nbsp;密码均为空</p>
+          </q-card-section>
+        </q-card>
+      </div>
+    </div>
+    <!-- electron end -->
+  </div>
+
+</template>
+
+<script>
+import { aesEncrypt } from 'src/utils/crypto.js'
+// import { userLogin } from 'src/api/user.js'
+
+import LottieWebCimo from '../../components/LottieWebCimo/LottieWebCimo'
+
+export default {
+  name: 'logon',
+  components: { LottieWebCimo },
+  data () {
+    return {
+      isPwd: true,
+      username: '',
+      password: '',
+      defaultOptions: {
+        path: 'https://assets9.lottiefiles.com/packages/lf20_vo0a1yca.json',
+        loop: true
+      },
+      loading: false,
+      isLottieF: false
+    }
+  },
+  methods: {
+    logon () {
+      this.loading = !this.loading
+
+      this.$store.dispatch('Login', {
+        username: this.username,
+        password: aesEncrypt(this.password)
+      }).then((res) => {
+        const { token, user } = res
+        // 初始化 store
+        sessionStorage.setItem('access_token', token)
+        sessionStorage.setItem('user_role', 'admin')
+        sessionStorage.setItem('user_nickname', user.nickname)
+        sessionStorage.setItem('user_avatar', user.avatar)
+        sessionStorage.setItem('user_id', user._id)
+        this.$store.commit('SET_NICKNAME', user.nickname)
+        this.$store.commit('SET_AVATAR', user.avatar)
+        // 跳转
+        this.$router.push('/').then(e => {
+          this.$q.notify({
+            icon: 'insert_emoticon',
+            message: `hi，${user.nickname} 欢迎回来`,
+            color: 'green',
+            position: 'top',
+            timeout: 1500
+          })
+          this.loading = !this.loading
+          // 如果是 electron 则改变窗口大小
+          if (process.env.MODE === 'electron') {
+            this.$q.electron.remote.getCurrentWindow().setSize(1023, 768)
+            this.$q.electron.remote.getCurrentWindow().center()
+          }
+        })
+      }).catch(() => {
+        this.loading = false
+      })
+    },
+    handleFinish (e) {
+      this.isLottieF = e
+    },
+    // 校验密码强度 8-16位，包含字母、数字、特殊符号
+    passwordStrengthCheck (pass) {
+      const passReg = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+`\-={}:";'<>,./]).{8,16}/
+      return passReg.test(pass) || '密码强度太弱，请重新输入。'
+    }
+  }
+}
+</script>
+
+<style scoped>
+.logon-btn {
+  font-size: large;
+  margin-top: 0px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.bg-logon-card-input {
+  background: linear-gradient(to right, #36d1dc 1%, #5b86e5 99%);
+  transition: all 0.3s ease-in-out;
+  background-size: 200% auto;
+}
+
+.bg-logon-card-input:hover {
+  background-position: right center;
+  box-shadow: 0 12px 20px -11px #5b86e5;
+}
+</style>
