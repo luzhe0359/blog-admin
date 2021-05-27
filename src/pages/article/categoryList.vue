@@ -5,16 +5,16 @@
       <q-card :bordered="false" style="box-shadow: none;">
         <!-- 搜索框 -->
         <q-card-section class="q-px-none q-py-sm">
-          <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-sm row items-end">
-            <q-input type="text" v-model="name" label="分类名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-10" />
-            <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading">
+          <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-y-sm row items-end" :class="{'q-gutter-sm':$q.screen.gt.sm}">
+            <q-input type="text" v-model="name" label="分类名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
+            <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading" :class="{'q-mr-sm':$q.screen.lt.md}">
               <template v-slot:loading>
                 <q-spinner-facebook />
               </template>
             </q-btn>
             <q-btn label="重 置" type="reset" color="grey" />
             <q-space />
-            <q-btn label="添 加" type="button" color="secondary" @click="openDialog" />
+            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="openDialog" />
           </q-form>
         </q-card-section>
         <q-card-section class="q-pa-none">
@@ -38,8 +38,9 @@
             <!-- 表格内容 -操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
-                <q-btn icon="edit" size="sm" flat dense @click="openDialog(props.row)" />
-                <q-btn icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
+                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="openDialog(props.row)" />
+                <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
+                <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
               </q-td>
             </template>
           </q-table>

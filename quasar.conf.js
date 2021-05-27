@@ -27,7 +27,7 @@ module.exports = function (ctx) {
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: [
-      'app.css'
+      'app.scss'
     ],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
@@ -41,14 +41,14 @@ module.exports = function (ctx) {
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
       'roboto-font', // optional, you are not bound to it
-      'fontawesome-v5',
+      // 'fontawesome-v5',
       'material-icons' // optional, you are not bound to it
     ],
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      publicPath: process.env.NODE_ENV === 'production' ? '/quasar-manage/' : '/',
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      publicPath: '/zugelu/',
+      vueRouterMode: process.env.NODE_ENV === 'production' ? 'history' : 'hash', // available values: 'hash', 'history'
 
       // transpile: false,
 
@@ -83,7 +83,7 @@ module.exports = function (ctx) {
       env: {
         URL: ctx.dev
           ? 'http://127.0.0.1:3000'
-          : ''
+          : 'http://www.zugelu.com:3000/'
       }
     },
 
@@ -223,8 +223,7 @@ module.exports = function (ctx) {
 
       builder: {
         // https://www.electron.build/configuration/configuration
-
-        appId: 'quasar-manage'
+        appId: 'zugelu'
       },
 
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration

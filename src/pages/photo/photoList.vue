@@ -5,17 +5,17 @@
       <q-card :bordered="false" style="box-shadow: none;">
         <!-- 搜索框 -->
         <q-card-section class="q-px-none q-py-sm">
-          <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-sm row items-end">
-            <q-select clearable color="teal" label="相册选择" options-selected-class="text-deep-orange" v-model="albumId" :options="albumList" option-value="_id" option-label="name" emit-value map-options class="col-lg-3 col-md-3 col-sm-6 col-xs-10"></q-select>
-            <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading">
+          <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-y-sm row items-end" :class="{'q-gutter-sm':$q.screen.gt.sm}">
+            <q-select clearable color="teal" label="相册选择" options-selected-class="text-deep-orange" v-model="albumId" :options="albumList" option-value="_id" option-label="name" emit-value map-options class="col-lg-3 col-md-3 col-sm-6 col-xs-12"></q-select>
+            <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading" :class="{'q-mr-sm':$q.screen.lt.md}">
               <template v-slot:loading>
                 <q-spinner-facebook />
               </template>
             </q-btn>
             <q-btn label="重 置" type="reset" color="grey" />
             <q-space />
-            <q-btn label="上 传" type="button" color="secondary" @click="uploadDialogVisible = true" />
-            <q-btn label="添 加" type="button" color="secondary" @click="addDialogVisible = true" />
+            <q-btn v-if="isZugelu" label="上 传" type="button" color="secondary" @click="uploadDialogVisible = true" :class="{'q-mr-sm':$q.screen.lt.md}" />
+            <q-btn v-if="isZugelu" label="添 加" type="button" color="secondary" @click="addDialogVisible = true" />
           </q-form>
         </q-card-section>
         <q-card-section class="q-pa-none">
@@ -39,7 +39,8 @@
             <!-- 表格内容 -操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
-                <q-btn icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
+                <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
+                <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
               </q-td>
             </template>
           </q-table>
@@ -57,7 +58,7 @@
         <template v-slot:body>
           <q-select filled clearable color="teal" label="相册选择" options-selected-class="text-deep-orange" v-model="uploadAblum" :options="albumList" option-value="_id" option-label="name" emit-value map-options class="col-12"></q-select>
           <q-uploader :url="`${$url}/photo/uploads?albumId=${uploadAblum}`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
-        ]" field-name='photo' multiple batch max-files="10" @uploaded="finishUpload" style="width:100%; height: 500px;" />
+        ]" field-name='photo' multiple batch max-files="10" @upload="startUpload" @uploaded="finishUpload" style="width:100%; height: 500px;" />
         </template>
       </BaseDialog>
     </div>
@@ -210,6 +211,18 @@ export default {
     cancelUpload () {
       this.uploadAblum = ''
       this.uploadDialogVisible = false
+    },
+    startUpload () {
+      console.log('startUpload')
+      if (!this.uploadAblum) {
+        return this.$q.notify({
+          icon: 'insert_emoticon',
+          message: '请先选择相册',
+          color: 'warning',
+          position: 'top',
+          timeout: 1500
+        })
+      }
     },
     // 上传图片事件
     finishUpload (file) {

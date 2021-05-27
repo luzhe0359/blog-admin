@@ -38,3 +38,21 @@ body,
     border-radius: 5px;
     background-color: rgba(97, 97, 97, .3)
 }
+
+// 头像高度100%
+.q-uploader__file--img {
+  height: 100%;
+}
+// input 校验不通过 背景色
+.q-field--standout.q-field--highlighted .q-field__control {
+  background-color: $deep-orange;
+}
+
+
+// markdown小屏幕内边距
+@media (max-width: $breakpoint-xs-max) {
+  .v-note-wrapper .v-note-panel .v-note-show .v-show-content,
+  .v-note-wrapper .v-note-panel .v-note-show .v-show-content-html {
+    padding: 10px !important;
+  }
+}

@@ -118,6 +118,10 @@ const errorHandle = (status, msg) => {
         case 2002:
             tip('用户名或密码错误!')
             break
+        // 2003: 用户名/密码错误
+        case 2003:
+            tip('权限不足，请联系管理员!')
+            break
         // 4001: token无效/未登录状态，跳转登录页
         case 4001:
             toLogin('未登录状态')

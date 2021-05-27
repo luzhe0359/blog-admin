@@ -5,9 +5,9 @@
       <q-card :bordered="false" style="box-shadow: none;">
         <!-- 搜索框 -->
         <q-card-section class="q-px-none q-py-sm">
-          <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-sm row items-end">
-            <q-input type="text" v-model="title" label="文章名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-10" />
-            <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading">
+          <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-y-sm row items-end" :class="{'q-gutter-sm':$q.screen.gt.sm}">
+            <q-input type="text" v-model="title" label="文章名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
+            <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading" :class="{'q-mr-sm':$q.screen.lt.md}">
               <template v-slot:loading>
                 <q-spinner-facebook />
               </template>
@@ -51,9 +51,9 @@
             <!-- 操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
-                <q-btn icon="search" size="sm" flat dense :to="`/articleDetail/${props.row._id}`" />
-                <q-btn icon="edit" size="sm" flat dense :to="{name:'articleWrite',query:{_id:props.row._id}}" />
-                <q-btn icon="delete" size="sm" flat dense @click="deleteArticle(props.row._id)" />
+                <q-btn icon="search" size="sm" flat dense :to="`/article/detail/${props.row._id}`" />
+                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense :to="{name:'article-write',query:{_id:props.row._id}}" />
+                <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteArticle(props.row._id)" />
               </q-td>
             </template>
           </q-table>

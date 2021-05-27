@@ -1,85 +1,88 @@
 <template>
-  <q-page class="q-pa-md">
-    <!-- 主体 -->
-    <q-card :bordered="false" style="box-shadow: none;">
-      <!-- 搜索框 -->
-      <q-card-section class="q-px-none q-py-sm">
-        <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-sm row items-end">
-          <q-input type="text" v-model="title" label="文章名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-10" />
-          <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading">
-            <template v-slot:loading>
-              <q-spinner-facebook />
-            </template>
-          </q-btn>
-          <q-btn label="重 置" type="reset" color="grey" />
-          <q-space />
-          <q-btn label="添 加" type="button" color="secondary" @click="albumDialog = true" />
-        </q-form>
-      </q-card-section>
-      <q-card-section class="q-pa-none">
-        <!-- 表格 -->
-        <q-table color="primary" :bordered="false" card-style="box-shadow: none;" row-key="id" :data="linkData" :columns="columns" :loading="loading" :pagination.sync="pagination" rows-per-page-label="每页条数:" :rows-per-page-options="[5, 10, 20, 50, 0]" :pagination-label="(firstRowIndex, endRowIndex, totalRowsNumber) => `${firstRowIndex}-${endRowIndex} / ${totalRowsNumber}`" no-data-label="很抱歉, 没有查询到您想要的结果 . . ." @request="request" binary-state-sort>
-          <!-- 无数据 -插槽 -->
-          <template v-slot:no-data="{ message }">
-            <div class="full-width row flex-center q-gutter-sm text-warning">
-              <q-icon v-show="!loading" size="2em" name="sentiment_dissatisfied" />
-              <span>
-                {{ message }}
-              </span>
-            </div>
-          </template>
-          <!-- 表格内容 -头像插槽 -->
-          <template v-slot:body-cell-logo="props">
-            <q-td :props="props">
-              <q-avatar round size="48px">
-                <img :src="`${$url}${props.row.logo}`" />
-              </q-avatar>
-            </q-td>
-          </template>
-          <!-- 表格内容 -操作插槽 -->
-          <template v-slot:body-cell-action="props">
-            <q-td :props="props" class="q-gutter-x-sm">
-              <q-btn icon="edit" size="sm" flat dense @click="newDialog(props.row)" />
-              <q-btn icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
-            </q-td>
-          </template>
-        </q-table>
-      </q-card-section>
-    </q-card>
-    <!-- 添加分类 -->
-    <q-dialog ref="dialog" v-model="albumDialog">
-      <q-card :style="$q.screen.lt.md? 'width:90vw':'width: 50vw'">
-        <q-card-section class="q-pa-sm">
-          <div class="text-h6 q-ma-xs">添加</div>
+  <BaseContent>
+    <div class="q-pa-md">
+      <!-- 主体 -->
+      <q-card :bordered="false" style="box-shadow: none;">
+        <!-- 搜索框 -->
+        <q-card-section class="q-px-none q-py-sm">
+          <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-y-sm row items-end" :class="{'q-gutter-sm':$q.screen.gt.sm}">
+            <q-input type="text" v-model="title" label="文章名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
+            <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading" :class="{'q-mr-sm':$q.screen.lt.md}">
+              <template v-slot:loading>
+                <q-spinner-facebook />
+              </template>
+            </q-btn>
+            <q-btn label="重 置" type="reset" color="grey" />
+            <q-space />
+            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="albumDialog = true" />
+          </q-form>
         </q-card-section>
-        <!-- <q-separator inset /> -->
-        <q-card-actions class="q-px-md">
+        <q-card-section class="q-pa-none">
+          <!-- 表格 -->
+          <q-table color="primary" :bordered="false" card-style="box-shadow: none;" row-key="id" :data="linkData" :columns="columns" :loading="loading" :pagination.sync="pagination" rows-per-page-label="每页条数:" :rows-per-page-options="[5, 10, 20, 50, 0]" :pagination-label="(firstRowIndex, endRowIndex, totalRowsNumber) => `${firstRowIndex}-${endRowIndex} / ${totalRowsNumber}`" no-data-label="很抱歉, 没有查询到您想要的结果 . . ." @request="request" binary-state-sort>
+            <!-- 无数据 -插槽 -->
+            <template v-slot:no-data="{ message }">
+              <div class="full-width row flex-center q-gutter-sm text-warning">
+                <q-icon v-show="!loading" size="2em" name="sentiment_dissatisfied" />
+                <span>
+                  {{ message }}
+                </span>
+              </div>
+            </template>
+            <!-- 表格内容 -头像插槽 -->
+            <template v-slot:body-cell-logo="props">
+              <q-td :props="props">
+                <q-avatar round size="48px">
+                  <img :src="`${$url}${props.row.logo}`" />
+                </q-avatar>
+              </q-td>
+            </template>
+            <!-- 表格内容 -操作插槽 -->
+            <template v-slot:body-cell-action="props">
+              <q-td :props="props" class="q-gutter-x-sm">
+                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="newDialog(props.row)" />
+                <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
+                <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
+              </q-td>
+            </template>
+          </q-table>
+        </q-card-section>
+      </q-card>
+      <!-- 添加友链 -->
+      <q-dialog ref="dialog" v-model="albumDialog">
+        <q-card :style="$q.screen.lt.md? 'width:90vw':'width: 50vw'">
+          <q-card-section class="q-pa-sm">
+            <div class="text-h6 q-ma-xs">添加</div>
+          </q-card-section>
+          <!-- <q-separator inset /> -->
+          <q-card-actions class="q-px-md">
+            <q-input class="full-width" v-model="title" autofocus label="名称" />
+            <q-input class="full-width" v-model="url" label="链接" />
+            <q-input class="full-width" v-model="desc" label="描述" maxlength='20' />
+            <div class="row no-wrap q-py-md">
+              <div class="q-mr-md">logo:</div>
+              <q-uploader :url="`${$url}/photo/upload`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
+        ]" field-name='photo' multiple batch max-files="1" @uploaded="finishUpload" style="width:200px; height: 200px;" />
+            </div>
+          </q-card-actions>
+          <!-- 按钮示例 -->
+          <q-card-actions align="right">
+            <q-btn flat color="grey" label="取消" @click="onCancelClick" />
+            <q-btn color="primary" label="保存" @click="onOKClick" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+      <BaseDialog :title="'编辑'" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
+        <template v-slot:body>
           <q-input class="full-width" v-model="title" autofocus label="名称" />
           <q-input class="full-width" v-model="url" label="链接" />
           <q-input class="full-width" v-model="desc" label="描述" maxlength='20' />
-          <div class="row no-wrap q-py-md">
-            <div class="q-mr-md">logo:</div>
-            <q-uploader :url="`${$url}/photo/upload`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
-        ]" field-name='photo' multiple batch max-files="1" @uploaded="finishUpload" style="width:200px; height: 200px;" />
-          </div>
-        </q-card-actions>
-        <!-- 按钮示例 -->
-        <q-card-actions align="right">
-          <q-btn flat color="grey" label="取消" @click="onCancelClick" />
-          <q-btn color="primary" label="保存" @click="onOKClick" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <BaseDialog :title="'编辑'" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
-      <template v-slot:body>
-        <q-input class="full-width" v-model="title" autofocus label="名称" />
-        <q-input class="full-width" v-model="url" label="链接" />
-        <q-input class="full-width" v-model="desc" label="描述" maxlength='20' />
-        <q-uploader :url="`${$url}/photo/upload`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
+          <q-uploader :url="`${$url}/photo/upload`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
         ]" field-name='photo' multiple batch max-files="10" @uploaded="finishUpload" style="width:100%; height: 500px;" />
-      </template>
-    </BaseDialog>
-  </q-page>
+        </template>
+      </BaseDialog>
+    </div>
+  </BaseContent>
 </template>
 
 <script>
@@ -167,11 +170,11 @@ export default {
       this.logo = ''
       this.searchLoading = false
     },
-    // 删除分类
+    // 删除友链
     deleteCategory (_id) {
       this.$q.dialog({
         title: '删除',
-        message: '确定要删除该分类吗?',
+        message: '确定要删除该友链吗?',
         cancel: true,
         persistent: true
       }).onOk(() => {

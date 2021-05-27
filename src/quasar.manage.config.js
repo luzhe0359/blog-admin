@@ -6,7 +6,7 @@ Vue.prototype.$url = process.env.URL
 Vue.prototype.$PUBLIC_PATH = process.env.VUE_ROUTER_BASE
 
 // 浏览器 title
-Vue.prototype.$title = ' | Vue Quasar'
+Vue.prototype.$title = ' | ZUGELU'
 
 // 侧边栏风格
 Vue.prototype.$SildeBar = 'hHh lpR fFf' // 风格二：lHh lpR fFf
@@ -24,7 +24,7 @@ Vue.prototype.$Max_KeepAlive = 10
 // 侧边栏底部文字
 Vue.prototype.$buttonList = [
   { text: 'Quasar', URL: 'http://www.quasarchs.com/' },
-  { text: 'Github', URL: 'https://github.com/lzzz0359/blog_admin' },
+  { text: 'Github', URL: 'https://github.com/luzhe0359/blog_admin' },
   { text: 'Gitee', URL: 'https://gitee.com/lzzz0359/blog_admin' },
   { text: '关于作者', URL: '/' }
 ]

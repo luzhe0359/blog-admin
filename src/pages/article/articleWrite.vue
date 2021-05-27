@@ -2,7 +2,9 @@
   <div id="ArticleWrite" class="q-pa-md column fit">
     <!-- markdown -->
     <div class="col">
-      <mavon-editor ref="md" :toolbars="toolbars" v-model="post.mdContent" :ishljs="true" codeStyle="atelier-plateau-dark" @change="editorChange" @imgAdd="imgAdd" :tabSize="4" style="height: 100%; width: 100%;"></mavon-editor>
+      <q-no-ssr>
+        <mavon-editor ref="md" :toolbars="toolbars" v-model="post.mdContent" :ishljs="true" codeStyle="atelier-plateau-dark" @change="editorChange" @imgAdd="imgAdd" :tabSize="4" style="height: 100%; width: 100%;"></mavon-editor>
+      </q-no-ssr>
     </div>
     <!-- 添加按钮 -->
     <q-page-sticky position="bottom-right" style="z-index: 3000" :offset="[20,50]" @click="openDialog">
@@ -19,41 +21,45 @@
         <!-- 文章分类 -->
         <div class="full-width">
           <!-- 已选分类 -->
-          <div class="q-pb-xs">
-            <label class="text-subtitle1">分类</label>
+          <div class="q-pb-xs fixed-height">
+            <label class="text-subtitle1 q-mr-md ">分类</label>
             <q-chip removable v-for="(v, k) in activeCategoryNames" :key="k" @remove="removeCategory(k, v)" size="md" color="primary" text-color="white">
               {{k}}
             </q-chip>
           </div>
           <!-- 分类列表 -->
-          <div :class="$q.dark.mode?'tags-border-dark':'tags-border-white'">
-            <div v-show="activeCategoryLen" class="absolute-full text-subtitle2 flex flex-center hover-mask">
-              <q-icon name="block" class="text-red q-px-sm"></q-icon>
-              <div class="text-subtitle1">最多选一个分类哦~</div>
+          <div class="tags-border" style="max-height:74px;">
+            <div class="relative-position">
+              <div v-show="activeCategoryLen" class="absolute-full text-subtitle2 flex flex-center hover-mask">
+                <q-icon name="block" class="text-red q-px-sm"></q-icon>
+                <div class="text-subtitle1">最多选一个分类哦~</div>
+              </div>
+              <q-chip clickable outline size="md" :disable="activeCategoryLen" :selected.sync="activeCategoryNames[item.name]" icon="check_box_outline_blank" color="primary" @click="clickCategory(item.name, item._id)" v-for="item in categoryList" :key="item._id">
+                {{item.name}}
+              </q-chip>
             </div>
-            <q-chip clickable outline size="md" :disable="activeCategoryLen" :selected.sync="activeCategoryNames[item.name]" icon="check_box_outline_blank" color="primary" @click="clickCategory(item.name, item._id)" v-for="item in categoryList" :key="item._id">
-              {{item.name}}
-            </q-chip>
           </div>
         </div>
         <!-- 文章标签 -->
         <div class="full-width">
           <!-- 已选标签 -->
-          <div class="q-pb-xs">
-            <label class="text-subtitle1">标签</label>
+          <div class="q-pb-xs fixed-height">
+            <label class="text-subtitle1 q-mr-md">标签</label>
             <q-chip removable v-for="(v, k) in activeTagNames" :key="k" @remove="removeTag(k, v)" size="md" color="primary" text-color="white">
               {{k}}
             </q-chip>
           </div>
           <!-- 标签列表 -->
-          <div :class="$q.dark.mode?'tags-border-dark':'tags-border-white'">
-            <div v-show="activeTagLen" class="absolute-full text-subtitle2 flex flex-center hover-mask">
-              <q-icon name="block" class="text-red q-px-sm"></q-icon>
-              <div class="text-subtitle1">最多选三个标签哦~</div>
+          <div class="tags-border" style="max-height:110px;">
+            <div class="relative-position">
+              <div v-show="activeTagLen" class="fit absolute-full text-subtitle2 flex flex-center hover-mask">
+                <q-icon name="block" class="text-red q-px-sm"></q-icon>
+                <div class="text-subtitle1">最多选三个标签哦~</div>
+              </div>
+              <q-chip clickable outline size="md" :disable="activeTagLen" :selected.sync="activeTagNames[item.name]" icon="check_box_outline_blank" color="primary" @click="clickTag(item.name, item._id)" v-for="item in tagList" :key="item._id">
+                {{item.name}}
+              </q-chip>
             </div>
-            <q-chip clickable outline size="md" :disable="activeTagLen" :selected.sync="activeTagNames[item.name]" icon="check_box_outline_blank" color="primary" @click="clickTag(item.name, item._id)" v-for="item in tagList" :key="item._id">
-              {{item.name}}
-            </q-chip>
           </div>
         </div>
         <div class="row full-width items-center">
@@ -65,8 +71,8 @@
           <q-select :class="$q.screen.lt.sm?'col':'select-width'" dense outlined emit-value map-options v-model="post.state" :options="typeOptions" />
         </div>
         <div class="row full-width">
-          <label class="text-subtitle1">简述</label>
-          <q-input class="full-width" type="text" dense clearable v-model="post.desc" label="请输入文章简述 ..." />
+          <label class="text-subtitle1">描述</label>
+          <q-input class="full-width" type="text" dense clearable v-model="post.desc" placeholder="请输入文章描述 ..." />
         </div>
       </template>
     </BaseDialog>
@@ -336,24 +342,33 @@ export default {
 
 <style lang="scss" scoped>
 .select-width {
-  width: 200px;
+  width: 220px;
 }
-.tags-border-white {
+// 防止选择标签后，高度变化
+.fixed-height {
+  height: 36px;
+  line-height: 36px;
+}
+.tags-border {
   position: relative;
-  border: 1px solid $grey-2;
+  border: 1px solid $grey-3;
+  transition: All 0.2s ease-in-out;
+  overflow-y: scroll;
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 10px 3px !important;
+  }
   .hover-mask {
     background-color: $grey-1;
     opacity: 0.8;
     z-index: 999;
   }
 }
-.tags-border-dark {
-  position: relative;
-  border: 1px solid $grey-9;
-  .hover-mask {
-    background-color: $grey-10;
-    opacity: 0.8;
-    z-index: 999;
-  }
+.disable-scroll {
+  overflow: hidden;
+}
+.hover-mask {
+  background-color: $grey-1;
+  opacity: 0.8;
+  z-index: 999;
 }
 </style>

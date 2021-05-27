@@ -1,43 +1,56 @@
 <template>
-  <div id="ArticleDetail" class="q-pa-md" style="height: calc(100vh - 50px);">
-    <div class="q-gutter-sm row items-end q-mb-sm">
-      <q-input type="text" v-model="post.title" label="标 题" readonly class="col" />
+  <BaseContent>
+    <div class="q-pa-md">
+      <div class="text-h5 q-py-md"> {{article.title}} </div>
+      <!-- <q-chip v-for="item in post.tags" :key="item._id" size="12px">
+        {{item.name}}
+      </q-chip> -->
+      <div class="text-grey q-pb-sm row">
+        <q-chip icon="iconfont icon-biaoqian" color="transparent" text-color="grey">{{article.type | articleType}}</q-chip>
+        <q-chip icon="iconfont icon-qiepian" color="transparent" text-color="grey"> {{article.createTime | dateFormat}}</q-chip>
+        <!-- 套一个div，小屏幕 换行 -->
+        <div v-if="article.meta">
+          <q-chip icon="iconfont icon-fangwenliang" color="transparent" text-color="grey">{{article.meta.views}}</q-chip>
+          <q-chip icon="iconfont icon-pinglun" color="transparent" text-color="grey"> {{article.meta.comments}}</q-chip>
+          <q-chip class="like-box" color="transparent" text-color="grey">
+            <q-icon class="like q-mr-xs" name="iconfont icon-xin" :color="isLike" size="21px"></q-icon>
+            {{article.meta.likes}}
+          </q-chip>
+        </div>
+        <q-space />
+        <q-chip color="primary" text-color="white" v-for="tag in article.tags" :key="tag._id">{{tag.name}}</q-chip>
+      </div>
+      <!-- markdown -->
+      <div>
+        <q-no-ssr>
+          <mavon-editor :value="article.mdContent" :subfield="false" :defaultOpen="'preview'" :toolbarsFlag="false" :editable="false" :scrollStyle="true" :ishljs="true" style="height: 100%; width: 100%;"></mavon-editor>
+        </q-no-ssr>
+      </div>
+      <!-- 标签 -->
     </div>
-    <div id="editor" style="height: calc(100% - 70px);">
-      <q-no-ssr>
-        <!-- <mavon-editor :value="post.mdContent" :subfield="false" :defaultOpen="'preview'" :toolbarsFlag="false" :editable="false" :scrollStyle="true" :ishljs="true" style="height: 100%; width: 100%;"></mavon-editor> -->
-      </q-no-ssr>
-    </div>
-    <!-- 操作 -->
-    <q-fab class="fixed-bottom-right q-mr-lg q-mb-lg" v-model="actions" label="操 作" external-label color="secondary" icon="keyboard_arrow_up" direction="up" padding="12px" :tabindex="'9988899'" :label-position="'left'">
-      <q-fab-action external-label color="grey" icon="settings_backup_restore" label="返 回" :label-position="'left'" @click="$router.go(-1)" />
-      <q-fab-action external-label :color="isLike ? 'red': 'grey'" icon="favorite_border" :label="isLike?'已 赞': '点 赞'" :label-position="'left'" @click="like" />
-    </q-fab>
-  </div>
+  </BaseContent>
 </template>
 
 <script>
-// import { mavonEditor } from 'mavon-editor'
-// import 'mavon-editor/dist/css/index.css'
+import { mavonEditor } from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
 
 // import { uploadImage } from 'src/api/photo.js'
-import { findArticleById, likeArticle, nolikeArticle } from 'src/api/article.js'
+import { findArticleById } from 'src/api/article.js'
 
 export default {
-  name: 'ArticleDetail',
+  name: 'articleDetail',
   components: {
-    // mavonEditor
+    mavonEditor
   },
   data () {
     return {
-      post: {
-        title: '',
-        mdContent: '',
-        htmlContent: '',
-        tags: []
-      },
-      isLike: false,
-      actions: true // 操作
+      article: ''
+    }
+  },
+  computed: {
+    isLike () {
+      return this.article.isLike ? 'red' : ''
     }
   },
   mounted () {
@@ -46,40 +59,16 @@ export default {
   methods: {
     // 根据_id查 文章
     findArticleById () {
-      findArticleById(this.$route.params._id, this.$q.localStorage.getItem('user')._id).then(res => {
-        const article = res.data
-        for (const key in this.post) {
-          this.post[key] = article[key]
-        }
-        this.isLike = article.isLike
-      })
-    },
-    like () {
-      // 文章点赞
-      !this.isLike && likeArticle({
-        articleId: this.$route.params._id,
-        userId: this.$q.localStorage.getItem('user')._id
-      }).then(res => {
-        // 点赞成功
-        this.isLike = true
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
-      })
-      // 取消点赞
-      this.isLike && nolikeArticle({
-        articleId: this.$route.params._id,
-        userId: this.$q.localStorage.getItem('user')._id
-      }).then(res => {
-        // 消赞成功
-        this.isLike = false
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
+      findArticleById(this.$route.params._id, sessionStorage.getItem('user_id')).then(res => {
+        this.article = res.data
+        console.log(this.article)
       })
     }
   }
 }
 </script>
+<style lang="scss" scoped>
+.q-page-sticky {
+  z-index: 9999;
+}
+</style>

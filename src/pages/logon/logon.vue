@@ -1,5 +1,4 @@
 <template>
-
   <div class="flex justify-center items-center q-electron-drag" style="height: 100%">
     <div class="row base-card-shadow electron-hide" style="width: 60vw;min-width: 300px">
       <div class="col-6 flex justify-center items-center " v-show="$q.screen.gt.sm">
@@ -12,7 +11,7 @@
           <q-card-section align="center">
             <h3 class="text-uppercase">zugelu</h3>
             <!-- 用户名 -->
-            <q-input class="logon-input" clearable standout="bg-cyan text-white" bottom-slots v-model="username" label="账号" debounce='500' lazy-rules :rules="[
+            <q-input class="logon-input" autofocus clearable standout="bg-cyan text-white" bottom-slots v-model="username" label="账号" debounce='500' lazy-rules :rules="[
                   val => (val && val.length > 0) || '请输入账号。',
                   val => (val.length >= 6 && val.length <= 12) || '请输入 6-12 位账号。',
                 ]">
@@ -35,11 +34,11 @@
             </q-input>
 
             <!-- 登录按钮 -->
-            <q-btn :loading="loading" class="logon-btn bg-logon-card-input" text-color="white" unelevated label="" style="font-size: large;" @click="logon">登 录 系 统
+            <q-btn :loading="loading" class="logon-btn bg-logon-card-input" text-color="white" unelevated label="" style="font-size: large;" @keyup.enter="logon" @click="logon">登 录 系 统
             </q-btn>
             <div class="row justify-between" style="margin-bottom: 20px;">
-              <q-btn flat label="忘记密码" />
-              <q-btn outline label="我要注册" />
+              <q-btn flat label="忘记密码" @click="forget" />
+              <q-btn outline label="我要注册" @click="forget" />
             </div>
             <!-- <p class="text-grey" align="left">账号2 ：test &nbsp;&nbsp;&nbsp;&nbsp;密码均为空</p> -->
           </q-card-section>
@@ -84,22 +83,19 @@
             <q-btn :loading="loading" class="logon-btn bg-logon-card-input" text-color="white" unelevated label="" style="font-size: large;" @click="logon">登 录 系 统
             </q-btn>
             <div class="row justify-between" style="margin-bottom: 20px;">
-              <q-btn flat label="忘记密码" />
-              <q-btn outline label="我要注册" />
+              <q-btn flat label="忘记密码" @click="forget" />
+              <q-btn outline label="我要注册" @click="forget" />
             </div>
-            <p class="text-grey" align="left">账号2 ：test &nbsp;&nbsp;&nbsp;&nbsp;密码均为空</p>
           </q-card-section>
         </q-card>
       </div>
     </div>
     <!-- electron end -->
   </div>
-
 </template>
 
 <script>
 import { aesEncrypt } from 'src/utils/crypto.js'
-// import { userLogin } from 'src/api/user.js'
 
 import LottieWebCimo from '../../components/LottieWebCimo/LottieWebCimo'
 
@@ -158,6 +154,15 @@ export default {
     },
     handleFinish (e) {
       this.isLottieF = e
+    },
+    forget () {
+      this.$q.notify({
+        icon: 'no_encryption',
+        message: '该功能暂未开放',
+        color: 'grey',
+        position: 'top',
+        timeout: 1500
+      })
     },
     // 校验密码强度 8-16位，包含字母、数字、特殊符号
     passwordStrengthCheck (pass) {

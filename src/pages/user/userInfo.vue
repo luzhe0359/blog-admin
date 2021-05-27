@@ -169,7 +169,4 @@ export default {
 .q-card {
   max-width: 500px;
 }
-::v-deep .q-uploader__file--img {
-  height: 100%;
-}
 </style>

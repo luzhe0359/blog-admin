@@ -4,16 +4,16 @@
     <q-card :bordered="false" class="q-pa-md" style="box-shadow: none;">
       <!-- 搜索框 -->
       <q-card-section class="q-px-none q-py-sm">
-        <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-sm row items-end">
-          <q-input type="text" v-model="name" label="分类名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-10" />
-          <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading">
+        <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-y-sm row items-end" :class="{'q-gutter-sm':$q.screen.gt.sm}">
+          <q-input type="text" v-model="name" label="相册名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
+          <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading" :class="{'q-mr-sm':$q.screen.lt.md}">
             <template v-slot:loading>
               <q-spinner-facebook />
             </template>
           </q-btn>
           <q-btn label="重 置" type="reset" color="grey" />
           <q-space />
-          <q-btn label="添 加" type="button" color="secondary" @click="addDialogVisible = true" />
+          <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="addDialogVisible = true" />
         </q-form>
       </q-card-section>
       <q-card-section class="q-pa-none">
@@ -37,8 +37,9 @@
           <!-- 表格内容 -操作插槽 -->
           <template v-slot:body-cell-action="props">
             <q-td :props="props" class="q-gutter-x-sm">
-              <q-btn icon="edit" size="sm" flat dense @click="newDialog(props.row)" />
-              <q-btn icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
+              <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="newDialog(props.row)" />
+              <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
+              <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
             </q-td>
           </template>
         </q-table>
@@ -66,11 +67,11 @@ import { date } from 'quasar'
 import { findAlbumList, deleteAlbumById, addAlbum, editAlbumById } from 'src/api/album.js'
 
 export default {
-  name: 'albumList',
+  name: 'photoAlbum',
   data () {
     return {
-      name: '', // 分类名称
-      desc: '', // 分类描述
+      name: '', // 相册名称
+      desc: '', // 相册描述
       loading: true, // 表格loading
       pagination: {
         sortBy: 'createTime', // 排序方式, 按照哪个字段排序
@@ -85,7 +86,7 @@ export default {
         { name: 'createTime', label: '创建时间', field: 'createTime', align: 'center', sortable: true, format: val => date.formatDate(val, 'YYYY-MM-DD HH:mm:ss') },
         { name: 'action', label: '操作', field: 'action', align: 'center' }
       ],
-      albumData: [], // 分类列表
+      albumData: [], // 相册列表
       searchLoading: false, // 查询loading
       addDialogVisible: false,
       editDialogVisible: false,
@@ -98,7 +99,7 @@ export default {
     })
   },
   methods: {
-    // 查找分类列表
+    // 查找相册列表
     request (props) {
       const { page, rowsPerPage, sortBy, descending } = props.pagination
 
@@ -137,11 +138,11 @@ export default {
       this.name = ''
       this.searchLoading = false
     },
-    // 删除分类
+    // 删除相册
     deleteCategory (_id) {
       this.$q.dialog({
         title: '删除',
-        message: '确定要删除该分类吗?',
+        message: '将删除相册及其包含的图片。确定要删除吗？',
         cancel: true,
         persistent: true
       }).onOk(() => {
@@ -184,6 +185,7 @@ export default {
     onCancelClick () {
       this.addDialogVisible = false
       this.name = ''
+      this.desc = ''
     },
     newDialog ({ _id, name, desc }) {
       this.albumId = _id
@@ -212,9 +214,10 @@ export default {
     },
     // dialog 取消
     cancelClick () {
+      this.editDialogVisible = false
       this.albumId = ''
       this.name = ''
-      this.editDialogVisible = false
+      this.desc = ''
     }
   }
 }

@@ -13,7 +13,7 @@ const asyncRoutesChildren = [
       icon: 'home',
       keepAlive: true
     },
-    component: () => import('../pages/home/home')
+    component: () => import('pages/home/home')
   },
   {
     path: '/async-router',
@@ -54,7 +54,7 @@ const asyncRoutesChildren = [
     children: [
       {
         path: 'list',
-        name: 'user-list',
+        name: 'userList',
         meta: {
           roles: ['admin', 'editor'],
           title: '用户列表',
@@ -65,7 +65,7 @@ const asyncRoutesChildren = [
       },
       {
         path: 'info',
-        name: 'user-info',
+        name: 'userInfo',
         meta: {
           roles: ['admin', 'editor'],
           title: '个人中心',
@@ -89,7 +89,7 @@ const asyncRoutesChildren = [
     children: [
       {
         path: 'list',
-        name: 'article-list',
+        name: 'articleList',
         meta: {
           roles: ['admin', 'editor'],
           title: '文章列表',
@@ -100,7 +100,7 @@ const asyncRoutesChildren = [
       },
       {
         path: 'write',
-        name: 'article-write',
+        name: 'articleWrite',
         meta: {
           roles: ['admin', 'editor'],
           title: '文章编写',
@@ -110,8 +110,20 @@ const asyncRoutesChildren = [
         component: () => import('pages/article/articleWrite')
       },
       {
+        path: 'detail/:_id?',
+        name: 'articleDetail',
+        meta: {
+          roles: ['admin', 'editor'],
+          title: '文章详情',
+          icon: 'article',
+          keepAlive: true,
+          isHidden: true
+        },
+        component: () => import('pages/article/articleDetail')
+      },
+      {
         path: 'category',
-        name: 'article-category',
+        name: 'articleCategory',
         meta: {
           roles: ['admin', 'editor'],
           title: '文章分类',
@@ -122,7 +134,7 @@ const asyncRoutesChildren = [
       },
       {
         path: 'tag',
-        name: 'article-tag',
+        name: 'articleTag',
         meta: {
           roles: ['admin', 'editor'],
           title: '文章标签',
@@ -147,7 +159,7 @@ const asyncRoutesChildren = [
     children: [
       {
         path: 'album',
-        name: 'photo-album',
+        name: 'photoAlbum',
         meta: {
           roles: ['admin', 'editor'],
           title: '相册列表',
@@ -158,7 +170,7 @@ const asyncRoutesChildren = [
       },
       {
         path: 'list',
-        name: 'photo-list',
+        name: 'photoList',
         meta: {
           roles: ['admin', 'editor'],
           title: '照片列表',
@@ -175,7 +187,8 @@ const asyncRoutesChildren = [
     meta: {
       roles: ['admin', 'editor'],
       title: '时间总轴',
-      icon: 'add_road'
+      icon: 'add_road',
+      keepAlive: true
     },
     component: () => import('../pages/timeline/timelineList')
   },
@@ -185,7 +198,8 @@ const asyncRoutesChildren = [
     meta: {
       roles: ['admin', 'editor'],
       title: '友情链接',
-      icon: 'all_inclusive'
+      icon: 'all_inclusive',
+      keepAlive: true
     },
     component: () => import('../pages/link/linkList')
   },
