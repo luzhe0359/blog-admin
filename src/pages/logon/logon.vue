@@ -134,13 +134,7 @@ export default {
         this.$store.commit('SET_AVATAR', user.avatar)
         // 跳转
         this.$router.push('/').then(e => {
-          this.$q.notify({
-            icon: 'insert_emoticon',
-            message: `hi，${user.nickname} 欢迎回来`,
-            color: 'green',
-            position: 'top',
-            timeout: 1500
-          })
+          this.$msg.success(`hi，${user.nickname} 欢迎回来`)
           this.loading = !this.loading
           // 如果是 electron 则改变窗口大小
           if (process.env.MODE === 'electron') {
@@ -160,8 +154,7 @@ export default {
         icon: 'no_encryption',
         message: '该功能暂未开放',
         color: 'grey',
-        position: 'top',
-        timeout: 1500
+        position: 'top'
       })
     },
     // 校验密码强度 8-16位，包含字母、数字、特殊符号
@@ -173,7 +166,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped >
 .logon-btn {
   font-size: large;
   margin-top: 0px;
@@ -190,5 +183,10 @@ export default {
 .bg-logon-card-input:hover {
   background-position: right center;
   box-shadow: 0 12px 20px -11px #5b86e5;
+}
+
+// input 校验不通过 背景色
+::v-deep .q-field--standout.q-field--highlighted .q-field__control {
+  background-color: $deep-orange;
 }
 </style>

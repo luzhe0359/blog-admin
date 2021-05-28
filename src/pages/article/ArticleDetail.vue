@@ -59,7 +59,7 @@ export default {
   methods: {
     // 根据_id查 文章
     findArticleById () {
-      findArticleById(this.$route.params._id, sessionStorage.getItem('user_id')).then(res => {
+      findArticleById(this.$route.params._id).then(res => {
         this.article = res.data
         console.log(this.article)
       })

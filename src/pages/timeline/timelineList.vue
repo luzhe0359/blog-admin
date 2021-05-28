@@ -6,7 +6,7 @@
         <!-- 搜索框 -->
         <q-card-section class="q-px-none q-py-sm">
           <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-sm row items-end" :class="{'q-gutter-sm':$q.screen.gt.sm}">
-            <q-input type="text" v-model="title" label="文章名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
+            <q-input type="text" v-model="searchTitle" label="时间线标题" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
             <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading" :class="{'q-mr-sm':$q.screen.lt.md}">
               <template v-slot:loading>
                 <q-spinner-facebook />
@@ -14,7 +14,7 @@
             </q-btn>
             <q-btn label="重 置" type="reset" color="grey" />
             <q-space />
-            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="addDialogVisible = true" />
+            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="showDialog" />
           </q-form>
         </q-card-section>
         <q-card-section class="q-pa-none">
@@ -32,7 +32,7 @@
             <!-- 表格内容 -操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
-                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="newDialog(props.row)" />
+                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="showDialog(props.row)" />
                 <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
                 <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
               </q-td>
@@ -40,43 +40,16 @@
           </q-table>
         </q-card-section>
       </q-card>
-      <!-- 添加分类 -->
-      <q-dialog ref="dialog" v-model="addDialogVisible">
-        <q-card :style="$q.screen.lt.md? 'width:90vw':'width: 50vw'">
-          <q-card-section class="q-pa-sm">
-            <div class="text-h6 q-ma-xs">添加</div>
-          </q-card-section>
-          <!-- <q-separator inset /> -->
-          <q-card-actions class="q-px-md">
-            <q-input class="full-width" v-model="title" autofocus label="名称" />
-            <q-input class="full-width" v-model="date" label="计划完工日期">
-              <template v-slot:append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
-                    <q-date v-model="date" mask="YYYY-MM-DD">
-                      <div class="row items-center justify-end">
-                        <q-btn v-close-popup label="Close" color="primary" flat />
-                      </div>
-                    </q-date>
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
-            <q-toggle v-model="finish" label="是否完成" left-label />
-            <q-input class="full-width" v-model="body" label="内容" filled type="textarea" />
-          </q-card-actions>
-          <!-- 按钮示例 -->
-          <q-card-actions align="right">
-            <q-btn flat color="grey" label="取消" @click="onCancelClick" />
-            <q-btn color="primary" label="保存" @click="onOKClick" />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
-      <BaseDialog :title="'编辑'" :dialogVisible="editDialogVisible" @okClick="okClick" @cancelClick="cancelClick">
+      <!-- 添加/编辑 -->
+      <BaseDialog :title="'添加'" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
         <template v-slot:body>
-          <q-input class="full-width" v-model="title" autofocus label="名称" />
-          <q-input class="full-width" v-model="date" label="计划完工日期">
-            <template v-slot:append>
+          <q-input label="名称" outlined dense class="full-width" v-model="title" autofocus>
+            <template v-slot:prepend>
+              <q-icon name="bubble_chart" />
+            </template>
+          </q-input>
+          <q-input label="计划完工日期" outlined dense class="full-width" v-model="date">
+            <template v-slot:prepend>
               <q-icon name="event" class="cursor-pointer">
                 <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
                   <q-date v-model="date" mask="YYYY-MM-DD">
@@ -88,8 +61,12 @@
               </q-icon>
             </template>
           </q-input>
-          <q-toggle v-model="finish" label="是否完成" left-label />
-          <q-input class="full-width" v-model="body" label="内容" filled type="textarea" />
+          <q-input label="描述" outlined dense autogrow counter class="full-width" v-model="body" type="textarea">
+            <template v-slot:prepend>
+              <q-icon name="create" />
+            </template>
+          </q-input>
+          <q-toggle class="q-mt-none" v-model="finish" label="是否完成" left-label />
         </template>
       </BaseDialog>
     </div>
@@ -104,6 +81,7 @@ export default {
   name: 'timeline',
   data () {
     return {
+      searchTitle: '', // 搜索
       title: '', // 时间线名称
       body: '', // 时间线描述
       finish: false, // 是否完成
@@ -111,7 +89,7 @@ export default {
       loading: true, // 表格loading
       pagination: {
         sortBy: 'createTime', // 排序方式, 按照哪个字段排序
-        descending: true, // 是否按降序排序
+        descending: false, // 是否按降序排序
         page: 1, // 页码
         rowsPerPage: 10, // 每页多少行, 0表示无限
         rowsNumber: 10 // 总行数
@@ -126,8 +104,8 @@ export default {
       ],
       timelineData: [], // 时间线列表
       searchLoading: false, // 查询loading
-      addDialogVisible: false,
-      editDialogVisible: false,
+      dialogVisible: false,
+      dialogTitle: '添加',
       timelineId: '' // 编辑id
     }
   },
@@ -140,9 +118,9 @@ export default {
     // 查找照片列表
     request (props) {
       const { page, rowsPerPage, sortBy, descending } = props.pagination
-
       this.loading = true
       const params = {
+        title: this.searchTitle,
         pageNum: page,
         pageSize: rowsPerPage,
         sortBy: sortBy,
@@ -172,17 +150,14 @@ export default {
     },
     // 重置
     onReset () {
-      this.title = ''
-      this.body = ''
-      this.date = ''
-      this.finish = false
+      this.searchTitle = ''
       this.searchLoading = false
     },
-    // 删除分类
+    // 删除
     deleteCategory (_id) {
       this.$q.dialog({
         title: '删除',
-        message: '确定要删除该分类吗?',
+        message: '确定要删除该时间线吗?',
         cancel: true,
         persistent: true
       }).onOk(() => {
@@ -190,54 +165,26 @@ export default {
           this.request({
             pagination: this.pagination
           })
-          // 删除成功
-          this.$q.notify({
-            message: res.msg,
-            color: 'primary'
-          })
+          this.$msg.success(res.msg)
         }).catch((err) => {
           throw new Error(err)
         })
-      }).onOk(() => {
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
-    // dialog 确认
-    onOKClick () {
-      const params = {
-        title: this.title,
-        body: this.body,
-        date: this.date,
-        finish: this.finish
+    // 展示弹框
+    showDialog ({ _id, title, body, finish, date }) {
+      this.dialogVisible = true
+      if (!_id) { // 有_id 为编辑，反之添加
+        this.dialogTitle = '添加'
+        return
       }
-      addTimeline(params).then(res => {
-        // 添加成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
-        this.onCancelClick()
-        this.request({
-          pagination: this.pagination
-        })
-      })
-    },
-    // dialog 取消
-    onCancelClick () {
-      this.addDialogVisible = false
-      this.title = ''
-      this.body = ''
-      this.date = ''
-      this.finish = false
-    },
-    newDialog ({ _id, title, body, finish, date }) {
+      this.dialogTitle = '编辑'
+
       this.title = title
       this.body = body
       this.date = date
       this.finish = finish
       this.timelineId = _id
-      this.editDialogVisible = true
     },
     // dialog 确认
     okClick () {
@@ -247,13 +194,20 @@ export default {
         date: this.date,
         finish: this.finish
       }
-
-      editTimelineById(this.timelineId, params).then(res => {
-        // 编辑成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
+      // 添加
+      if (this.dialogTitle === '添加') {
+        addTimeline(params).then(res => {
+          this.$msg.success(res.msg)
+          this.cancelClick()
+          this.request({
+            pagination: this.pagination
+          })
         })
+        return
+      }
+      // 编辑
+      editTimelineById(this.timelineId, params).then(res => {
+        this.$msg.success(res.msg)
         this.cancelClick()
         this.request({
           pagination: this.pagination
@@ -262,7 +216,8 @@ export default {
     },
     // dialog 取消
     cancelClick () {
-      this.editDialogVisible = false
+      this.dialogVisible = false
+      this.timelineId = ''
       this.title = ''
       this.date = ''
       this.body = ''

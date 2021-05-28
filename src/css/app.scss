@@ -43,11 +43,6 @@ body,
 .q-uploader__file--img {
   height: 100%;
 }
-// input 校验不通过 背景色
-.q-field--standout.q-field--highlighted .q-field__control {
-  background-color: $deep-orange;
-}
-
 
 // markdown小屏幕内边距
 @media (max-width: $breakpoint-xs-max) {

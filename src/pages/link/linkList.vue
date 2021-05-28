@@ -6,7 +6,7 @@
         <!-- 搜索框 -->
         <q-card-section class="q-px-none q-py-sm">
           <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-y-sm row items-end" :class="{'q-gutter-sm':$q.screen.gt.sm}">
-            <q-input type="text" v-model="title" label="文章名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
+            <q-input type="text" v-model="searchTitle" label="网站名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
             <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading" :class="{'q-mr-sm':$q.screen.lt.md}">
               <template v-slot:loading>
                 <q-spinner-facebook />
@@ -14,7 +14,7 @@
             </q-btn>
             <q-btn label="重 置" type="reset" color="grey" />
             <q-space />
-            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="albumDialog = true" />
+            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="showDialog" />
           </q-form>
         </q-card-section>
         <q-card-section class="q-pa-none">
@@ -33,14 +33,14 @@
             <template v-slot:body-cell-logo="props">
               <q-td :props="props">
                 <q-avatar round size="48px">
-                  <img :src="`${$url}${props.row.logo}`" />
+                  <q-img no-default-spinner transition="slide-down" :src="`${$url}${props.row.logo}`" :placeholder-src="'/images/default_avatar.jpg' | imgBaseUrl" />
                 </q-avatar>
               </q-td>
             </template>
             <!-- 表格内容 -操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
-                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="newDialog(props.row)" />
+                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="showDialog(props.row)" />
                 <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
                 <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
               </q-td>
@@ -48,37 +48,29 @@
           </q-table>
         </q-card-section>
       </q-card>
-      <!-- 添加友链 -->
-      <q-dialog ref="dialog" v-model="albumDialog">
-        <q-card :style="$q.screen.lt.md? 'width:90vw':'width: 50vw'">
-          <q-card-section class="q-pa-sm">
-            <div class="text-h6 q-ma-xs">添加</div>
-          </q-card-section>
-          <!-- <q-separator inset /> -->
-          <q-card-actions class="q-px-md">
-            <q-input class="full-width" v-model="title" autofocus label="名称" />
-            <q-input class="full-width" v-model="url" label="链接" />
-            <q-input class="full-width" v-model="desc" label="描述" maxlength='20' />
-            <div class="row no-wrap q-py-md">
-              <div class="q-mr-md">logo:</div>
-              <q-uploader :url="`${$url}/photo/upload`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
-        ]" field-name='photo' multiple batch max-files="1" @uploaded="finishUpload" style="width:200px; height: 200px;" />
-            </div>
-          </q-card-actions>
-          <!-- 按钮示例 -->
-          <q-card-actions align="right">
-            <q-btn flat color="grey" label="取消" @click="onCancelClick" />
-            <q-btn color="primary" label="保存" @click="onOKClick" />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
-      <BaseDialog :title="'编辑'" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
+      <!-- 添加/编辑 -->
+      <BaseDialog :title="dialogTitle" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
         <template v-slot:body>
-          <q-input class="full-width" v-model="title" autofocus label="名称" />
-          <q-input class="full-width" v-model="url" label="链接" />
-          <q-input class="full-width" v-model="desc" label="描述" maxlength='20' />
-          <q-uploader :url="`${$url}/photo/upload`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
-        ]" field-name='photo' multiple batch max-files="10" @uploaded="finishUpload" style="width:100%; height: 500px;" />
+          <q-input label="名称" outlined dense class="full-width" v-model="title" autofocus maxlength="10">
+            <template v-slot:prepend>
+              <q-icon name="bubble_chart" />
+            </template>
+          </q-input>
+          <q-input label="链接" outlined dense class="full-width" v-model="url">
+            <template v-slot:prepend>
+              <q-icon name="attachment" />
+            </template>
+          </q-input>
+          <q-input label="描述" outlined dense class="full-width" v-model="desc" maxlength='22'>
+            <template v-slot:prepend>
+              <q-icon name="create" />
+            </template>
+          </q-input>
+          <div class="row no-wrap q-py-md">
+            <div class="text-subtitle1 q-mr-md ">logo</div>
+            <q-uploader :url="`${$url}/photo/upload`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
+        ]" field-name='photo' multiple batch max-files="1" @uploaded="finishUpload" style="width:200px; height: 200px;" />
+          </div>
         </template>
       </BaseDialog>
     </div>
@@ -95,6 +87,7 @@ export default {
   data () {
     return {
       token: getToken(),
+      searchTitle: '', // 搜索
       title: '', // 友链名称
       desc: '', // 友链描述
       url: '', //  友链地址
@@ -117,9 +110,8 @@ export default {
       ],
       linkData: [], // 友链列表
       searchLoading: false, // 查询loading
-      albumDialog: false,
       dialogVisible: false,
-      UploadDialogVisible: false,
+      dialogTitle: '添加',
       linkId: '' // 编辑id
     }
   },
@@ -135,13 +127,14 @@ export default {
 
       this.loading = true
       const params = {
+        title: this.searchTitle,
         pageNum: page,
         pageSize: rowsPerPage,
         sortBy: sortBy,
         descending: descending ? 1 : -1
       }
       findLinkList(params).then(res => {
-        this.searchLoading = false // 关闭查询按钮loading
+        this.searchLoading = false
 
         this.linkData = res.data
         this.pagination.page = page
@@ -164,10 +157,7 @@ export default {
     },
     // 重置
     onReset () {
-      this.title = ''
-      this.desc = ''
-      this.url = ''
-      this.logo = ''
+      this.searchTitle = ''
       this.searchLoading = false
     },
     // 删除友链
@@ -182,11 +172,7 @@ export default {
           this.request({
             pagination: this.pagination
           })
-          // 删除成功
-          this.$q.notify({
-            message: res.msg,
-            color: 'primary'
-          })
+          this.$msg.success(res.msg)
         }).catch((err) => {
           throw new Error(err)
         })
@@ -195,41 +181,31 @@ export default {
       }).onDismiss(() => {
       })
     },
-    // dialog 确认
-    onOKClick () {
-      const params = {
-        title: this.title,
-        url: this.url,
-        desc: this.desc,
-        logo: this.logo
+    // 上传图片事件
+    finishUpload (file) {
+      const res = JSON.parse(file.xhr.response)
+      this.logo = res.data.url
+      if (res.code === 2000) {
+        // 上传成功
+        this.$msg.success(res.msg)
+        // 然后隐藏对话框
+        this.avatarDialog = false
       }
-      addLink(params).then(res => {
-        // 添加成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
-        this.onCancelClick()
-        this.request({
-          pagination: this.pagination
-        })
-      })
     },
-    // dialog 取消
-    onCancelClick () {
-      this.albumDialog = false
-      this.title = ''
-      this.url = ''
-      this.desc = ''
-      this.logo = ''
-    },
-    newDialog ({ _id, title, url, desc, logo }) {
+    // 展示弹框
+    showDialog ({ _id, title, url, desc, logo }) {
+      this.dialogVisible = true
+      if (!_id) { // 判断有无_id，有_id编辑，反之添加
+        this.dialogTitle = '添加'
+        return
+      }
+      this.dialogTitle = '编辑'
+
       this.title = title
       this.url = url
       this.desc = desc
       this.logo = logo
       this.linkId = _id
-      this.dialogVisible = true
     },
     // dialog 确认
     okClick () {
@@ -239,13 +215,20 @@ export default {
         desc: this.desc,
         logo: this.logo
       }
-
-      editLinkById(this.linkId, params).then(res => {
-        // 编辑成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
+      // 添加
+      if (this.dialogTitle === '添加') {
+        addLink(params).then(res => {
+          this.$msg.success(res.msg)
+          this.cancelClick()
+          this.request({
+            pagination: this.pagination
+          })
         })
+        return
+      }
+      // 编辑
+      editLinkById(this.linkId, params).then(res => {
+        this.$msg.success(res.msg)
         this.cancelClick()
         this.request({
           pagination: this.pagination
@@ -255,24 +238,11 @@ export default {
     // dialog 取消
     cancelClick () {
       this.dialogVisible = false
+      this.linkId = ''
       this.title = ''
       this.url = ''
       this.desc = ''
       this.logo = ''
-    },
-    // 上传图片事件
-    finishUpload (file) {
-      const res = JSON.parse(file.xhr.response)
-      this.logo = res.data.url
-      if (res.code === 2000) {
-        // 上传成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
-        // 然后隐藏对话框
-        this.avatarDialog = false
-      }
     }
   }
 }

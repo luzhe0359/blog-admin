@@ -22,9 +22,7 @@ export default {
                 icon: 'no_encryption_gmailerrorred',
                 message: '暂无权限, 请联系管理员',
                 color: 'warning',
-                textColor: 'dark',
-                position: 'top',
-                timeout: 1500
+                textColor: 'dark'
             })
         }
     }

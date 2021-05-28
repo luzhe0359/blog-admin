@@ -100,12 +100,7 @@ export default {
 
     logout () {
       this.$store.dispatch('Logout').then(() => {
-        this.$q.notify({
-          message: '退出成功',
-          color: 'green',
-          position: 'top',
-          timeout: 1500
-        })
+        this.$msg.success('退出成功')
         this.$router.push('/logon')
         window.sessionStorage.clear()
       }).catch(() => {

@@ -5,7 +5,7 @@
       <!-- 搜索框 -->
       <q-card-section class="q-px-none q-py-sm">
         <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-y-sm row items-end" :class="{'q-gutter-sm':$q.screen.gt.sm}">
-          <q-input type="text" v-model="name" label="相册名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
+          <q-input type="text" v-model="searchName" label="相册名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
           <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading" :class="{'q-mr-sm':$q.screen.lt.md}">
             <template v-slot:loading>
               <q-spinner-facebook />
@@ -13,7 +13,7 @@
           </q-btn>
           <q-btn label="重 置" type="reset" color="grey" />
           <q-space />
-          <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="addDialogVisible = true" />
+          <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="showDialog" />
         </q-form>
       </q-card-section>
       <q-card-section class="q-pa-none">
@@ -28,16 +28,10 @@
               </span>
             </div>
           </template>
-          <!-- 文章标签 -->
-          <!-- <template v-slot:body-cell-icon="props">
-            <q-td :props="props">
-              <q-icon size="md" :name="'iconfont ' + props.row.icon"></q-icon>
-            </q-td>
-          </template> -->
           <!-- 表格内容 -操作插槽 -->
           <template v-slot:body-cell-action="props">
             <q-td :props="props" class="q-gutter-x-sm">
-              <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="newDialog(props.row)" />
+              <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="showDialog(props.row)" />
               <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
               <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
             </q-td>
@@ -46,17 +40,18 @@
       </q-card-section>
     </q-card>
     <!-- 添加相册 -->
-    <BaseDialog :title="'添加'" :dialogVisible="addDialogVisible" @okClick="onOKClick" @cancelClick="onCancelClick">
+    <BaseDialog :title="dialogTitle" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
       <template v-slot:body>
-        <q-input class="full-width" v-model="name" autofocus label="相册名称" />
-        <q-input class="full-width" v-model="desc" label="相册描述" filled type="textarea" />
-      </template>
-    </BaseDialog>
-    <!-- 编辑相册 -->
-    <BaseDialog :title="'编辑'" :dialogVisible="editDialogVisible" @okClick="okClick" @cancelClick="cancelClick">
-      <template v-slot:body>
-        <q-input class="full-width" v-model="name" autofocus label="相册名称" />
-        <q-input class="full-width" v-model="desc" label="相册描述" filled type="textarea" />
+        <q-input label="名称" outlined dense class="full-width" v-model="name" autofocus>
+          <template v-slot:prepend>
+            <q-icon name="bubble_chart" />
+          </template>
+        </q-input>
+        <q-input label="描述" outlined dense autogrow counter class="full-width" v-model="desc" type="textarea">
+          <template v-slot:prepend>
+            <q-icon name="create" />
+          </template>
+        </q-input>
       </template>
     </BaseDialog>
   </BaseContent>
@@ -70,6 +65,7 @@ export default {
   name: 'photoAlbum',
   data () {
     return {
+      searchName: '', // 搜索
       name: '', // 相册名称
       desc: '', // 相册描述
       loading: true, // 表格loading
@@ -88,8 +84,8 @@ export default {
       ],
       albumData: [], // 相册列表
       searchLoading: false, // 查询loading
-      addDialogVisible: false,
-      editDialogVisible: false,
+      dialogVisible: false,
+      dialogTitle: '',
       albumId: ''
     }
   },
@@ -105,7 +101,7 @@ export default {
 
       this.loading = true
       const params = {
-        name: this.name,
+        name: this.searchName,
         pageNum: page,
         pageSize: rowsPerPage,
         sortBy: sortBy,
@@ -135,10 +131,10 @@ export default {
     },
     // 重置
     onReset () {
-      this.name = ''
+      this.searchName = ''
       this.searchLoading = false
     },
-    // 删除相册
+    // 删除
     deleteCategory (_id) {
       this.$q.dialog({
         title: '删除',
@@ -151,47 +147,24 @@ export default {
             pagination: this.pagination
           })
           // 删除成功
-          this.$q.notify({
-            message: res.msg,
-            color: 'primary'
-          })
+          this.$msg.success(res.msg)
         }).catch((err) => {
           throw new Error(err)
         })
-      }).onOk(() => {
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
-    // dialog 确认
-    onOKClick () {
-      const params = {
-        name: this.name,
-        desc: this.desc
+    // 展示弹框
+    showDialog ({ _id, name, desc }) {
+      this.dialogVisible = true
+      if (!_id) { // 有_id 为编辑，反之添加
+        this.dialogTitle = '添加'
+        return
       }
-      addAlbum(params).then(res => {
-        // 添加成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
-        this.onCancelClick()
-        this.request({
-          pagination: this.pagination
-        })
-      })
-    },
-    // dialog 取消
-    onCancelClick () {
-      this.addDialogVisible = false
-      this.name = ''
-      this.desc = ''
-    },
-    newDialog ({ _id, name, desc }) {
+      this.dialogTitle = '编辑'
+
       this.albumId = _id
       this.name = name
       this.desc = desc
-      this.editDialogVisible = true
     },
     // dialog 确认
     okClick () {
@@ -199,13 +172,20 @@ export default {
         name: this.name,
         desc: this.desc
       }
-
-      editAlbumById(this.albumId, params).then(res => {
-        // 编辑成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
+      // 添加
+      if (this.dialogTitle === '添加') {
+        addAlbum(params).then(res => {
+          this.$msg.success(res.msg)
+          this.cancelClick()
+          this.request({
+            pagination: this.pagination
+          })
         })
+        return
+      }
+      // 编辑
+      editAlbumById(this.albumId, params).then(res => {
+        this.$msg.success(res.msg)
         this.cancelClick()
         this.request({
           pagination: this.pagination
@@ -214,7 +194,7 @@ export default {
     },
     // dialog 取消
     cancelClick () {
-      this.editDialogVisible = false
+      this.dialogVisible = false
       this.albumId = ''
       this.name = ''
       this.desc = ''

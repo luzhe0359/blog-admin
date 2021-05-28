@@ -6,8 +6,8 @@
         <mavon-editor ref="md" :toolbars="toolbars" v-model="post.mdContent" :ishljs="true" codeStyle="atelier-plateau-dark" @change="editorChange" @imgAdd="imgAdd" :tabSize="4" style="height: 100%; width: 100%;"></mavon-editor>
       </q-no-ssr>
     </div>
-    <!-- 添加按钮 -->
-    <q-page-sticky position="bottom-right" style="z-index: 3000" :offset="[20,50]" @click="openDialog">
+    <!-- 添加按钮(右下角) -->
+    <q-page-sticky position="bottom-right" style="z-index: 3000" :offset="[20,50]" @click="showDialog">
       <q-btn padding="md" round color="primary" icon="eco" />
     </q-page-sticky>
     <!-- 添加文章 -->
@@ -28,12 +28,12 @@
             </q-chip>
           </div>
           <!-- 分类列表 -->
-          <div class="tags-border" style="max-height:74px;">
-            <div class="relative-position">
-              <div v-show="activeCategoryLen" class="absolute-full text-subtitle2 flex flex-center hover-mask">
-                <q-icon name="block" class="text-red q-px-sm"></q-icon>
-                <div class="text-subtitle1">最多选一个分类哦~</div>
-              </div>
+          <div class="tags-border overflow-hidden" style="max-height:74px;">
+            <div v-show="activeCategoryLen" class="absolute-full text-subtitle2 flex flex-center hover-mask">
+              <q-icon name="block" class="text-red q-px-sm"></q-icon>
+              <div class="text-subtitle1">最多选一个分类哦~</div>
+            </div>
+            <div class="scroll" style="max-height:74px;">
               <q-chip clickable outline size="md" :disable="activeCategoryLen" :selected.sync="activeCategoryNames[item.name]" icon="check_box_outline_blank" color="primary" @click="clickCategory(item.name, item._id)" v-for="item in categoryList" :key="item._id">
                 {{item.name}}
               </q-chip>
@@ -50,12 +50,14 @@
             </q-chip>
           </div>
           <!-- 标签列表 -->
-          <div class="tags-border" style="max-height:110px;">
-            <div class="relative-position">
-              <div v-show="activeTagLen" class="fit absolute-full text-subtitle2 flex flex-center hover-mask">
-                <q-icon name="block" class="text-red q-px-sm"></q-icon>
-                <div class="text-subtitle1">最多选三个标签哦~</div>
-              </div>
+          <div class="tags-border overflow-hidden" style="max-height:110px;">
+            <!-- 模态框 -->
+            <div v-show="activeTagLen" class="fit absolute-full text-subtitle2 flex flex-center hover-mask">
+              <q-icon name="block" class="text-red q-px-sm"></q-icon>
+              <div class="text-subtitle1">最多选三个标签哦~</div>
+            </div>
+            <!-- 标签 -->
+            <div class="scroll" style="max-height:110px;">
               <q-chip clickable outline size="md" :disable="activeTagLen" :selected.sync="activeTagNames[item.name]" icon="check_box_outline_blank" color="primary" @click="clickTag(item.name, item._id)" v-for="item in tagList" :key="item._id">
                 {{item.name}}
               </q-chip>
@@ -164,10 +166,10 @@ export default {
   },
   created () {
     this.id = this.$route.query._id || ''
-    this.findTagList()
-    this.findCategoryList()
+    this.getTagList()
+    this.getCategoryList()
 
-    this.id && this.findArticleById()
+    this.id && this.getArticleById()
   },
   watch: {
     // 标签对象，转为数组
@@ -205,30 +207,26 @@ export default {
       })
     },
     // 保存
-    openDialog () {
+    showDialog () {
       if (!this.post.mdContent) {
-        return this.$q.notify({
-          message: '文章内容不能为空!',
-          color: 'ongoing',
-          icon: 'error'
-        })
+        return this.$msg.warning('文章内容不能为空')
       }
       this.articleDialog = true
     },
     // 标签列表
-    findTagList () {
+    getTagList () {
       findTagList().then(res => {
         this.tagList = res.data
       })
     },
     // 分类列表
-    findCategoryList () {
+    getCategoryList () {
       findCategoryList().then(res => {
         this.categoryList = res.data
       })
     },
     // 根据_id查 文章
-    findArticleById () {
+    getArticleById () {
       const params = {
         admin: true // 为admin, 访问数、不+1
       }
@@ -251,60 +249,40 @@ export default {
     // dialog 确认
     okClick () {
       if (!this.post.title) {
-        return this.$q.notify({
-          message: '文章标题不能为空!',
-          color: 'ongoing',
-          icon: 'error'
-        })
+        return this.$msg.warning('请填写文章标题')
+      }
+      if (this.post.category.length < 1) {
+        return this.$msg.warning('请选择文章分类')
       }
       if (this.post.tags.length < 1) {
-        return this.$q.notify({
-          message: '请选择文章标签!',
-          color: 'ongoing',
-          icon: 'error'
-        })
+        return this.$msg.warning('请选择文章标签')
       }
-      if (!this.post.type) {
-        return this.$q.notify({
-          message: '请选择文章分类!',
-          color: 'ongoing',
-          icon: 'error'
-        })
+      if (!this.post.desc) {
+        return this.$msg.warning('请填写文章标题描述')
       }
+
       // 有_id 即为编辑
       if (this.id) {
         EditArticleById(this.id, this.post).then(res => {
           // 修改成功
-          this.$q.notify({
-            message: res.msg,
-            color: 'primary'
-          })
+          this.$msg.success(res.msg)
           this.articleDialog = false
         })
         return
       }
       addArticle(this.post).then(res => {
-        // 添加成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
-
-        this.post.title = ''
-        this.post.desc = ''
-        this.post.mdContent = ''
-        this.post.htmlContent = ''
-        this.post.tags = []
-        this.post.type = 1
-        this.post.state = 1
-        this.activeTagNames = {}
-        this.activeTagIds = {}
-        this.articleDialog = false
+        this.$msg.success(res.msg)
+        this.cancelClick()
       })
     },
     // dialog 取消
     cancelClick () {
       this.articleDialog = false
+      this.post = this.$options.data().post
+      this.activeTagNames = {}
+      this.activeTagIds = {}
+      this.activeCategoryNames = {}
+      this.activeCategoryIds = {}
     },
     // 点击标签
     clickTag (name, _id) {
@@ -353,9 +331,8 @@ export default {
   position: relative;
   border: 1px solid $grey-3;
   transition: All 0.2s ease-in-out;
-  overflow-y: scroll;
   &:hover {
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 10px 3px !important;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 12px 2px !important;
   }
   .hover-mask {
     background-color: $grey-1;

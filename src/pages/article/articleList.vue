@@ -52,7 +52,7 @@
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
                 <q-btn icon="search" size="sm" flat dense :to="`/article/detail/${props.row._id}`" />
-                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense :to="{name:'article-write',query:{_id:props.row._id}}" />
+                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense :to="{name:'articleWrite',query:{_id:props.row._id}}" />
                 <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteArticle(props.row._id)" />
               </q-td>
             </template>
@@ -81,15 +81,7 @@ export default {
         rowsNumber: 10 // 总行数
       },
       ArticleColumns: [
-        {
-          name: 'title', // 唯一的ID
-          required: true, // （可选）如果我们使用可见列，这个列将始终可见
-          label: '标题', // 头部标签
-          align: 'left', // 对齐方式
-          field: 'title', // 行对象属性以确定此列的值，或field: row => row.some.nested.prop
-          format: val => `${val}`, // （可选）您可以使用函数格式化数据
-          sortable: true // （可选）告诉QTable你想要这个列可排序
-        },
+        { name: 'title', required: true, label: '标题', align: 'left', field: 'title', sortable: true },
         { name: 'category', label: '分类', field: 'category', align: 'center', format: val => val && val.name },
         { name: 'tags', label: '标签', field: 'tags', align: 'center' },
         { name: 'type', label: '类型', field: 'type', align: 'center' },
@@ -162,17 +154,10 @@ export default {
           this.request({
             pagination: this.pagination
           })
-          // 删除成功
-          this.$q.notify({
-            message: res.msg,
-            color: 'primary'
-          })
+          this.$msg.success(res.msg)
         }).catch((err) => {
           throw new Error(err)
         })
-      }).onOk(() => {
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     }
   }

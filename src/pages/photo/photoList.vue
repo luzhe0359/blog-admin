@@ -39,7 +39,7 @@
             <!-- 表格内容 -操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
-                <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
+                <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="handleDelete(props.row._id)" />
                 <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
               </q-td>
             </template>
@@ -47,18 +47,30 @@
         </q-card-section>
       </q-card>
       <!-- 添加相册 -->
-      <BaseDialog :title="'添加'" :dialogVisible="addDialogVisible" @okClick="okClick" @cancelClick="cancelClick">
+      <BaseDialog :title="'添加相册'" :dialogVisible="addDialogVisible" @okClick="okClick" @cancelClick="cancelClick">
         <template v-slot:body>
-          <q-input class="full-width" v-model="name" autofocus label="相册名称" />
-          <q-input class="full-width" v-model="desc" label="相册描述" filled type="textarea" />
+          <q-input label="名称" outlined dense class="full-width" v-model="name" autofocus>
+            <template v-slot:prepend>
+              <q-icon name="bubble_chart" />
+            </template>
+          </q-input>
+          <q-input label="描述" outlined dense autogrow counter class="full-width" v-model="desc" type="textarea">
+            <template v-slot:prepend>
+              <q-icon name="create" />
+            </template>
+          </q-input>
         </template>
       </BaseDialog>
       <!-- 添加照片 -->
       <BaseDialog :title="'图片上传'" :dialogVisible="uploadDialogVisible" @okClick="okUpload" @cancelClick="cancelUpload">
         <template v-slot:body>
-          <q-select filled clearable color="teal" label="相册选择" options-selected-class="text-deep-orange" v-model="uploadAblum" :options="albumList" option-value="_id" option-label="name" emit-value map-options class="col-12"></q-select>
-          <q-uploader :url="`${$url}/photo/uploads?albumId=${uploadAblum}`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
-        ]" field-name='photo' multiple batch max-files="10" @upload="startUpload" @uploaded="finishUpload" style="width:100%; height: 500px;" />
+          <q-select label="选择相册" outlined dense clearable color="teal" options-selected-class="text-deep-orange" v-model="uploadAblum" :options="albumList" option-value="_id" option-label="name" emit-value map-options class="full-width">
+            <template v-slot:prepend>
+              <q-icon name="photo_library" />
+            </template>
+          </q-select>
+          <q-uploader v-show="uploadAblum" :url="`${$url}/photo/uploads?albumId=${uploadAblum}`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
+        ]" field-name='photo' multiple batch max-files="10" @uploaded="finishUpload" style="width:100%; height: 500px;" />
         </template>
       </BaseDialog>
     </div>
@@ -99,7 +111,7 @@ export default {
       addDialogVisible: false, // 添加 dialog
       uploadDialogVisible: false, // 上传 dialog
       albumId: '', //  绑定相册 下拉框
-      albumList: [], // 相册 下拉框
+      albumList: [], // 相册列表 下拉框
       uploadAblum: '' // 绑定上传 下拉框
     }
   },
@@ -107,11 +119,7 @@ export default {
     this.request({
       pagination: this.pagination
     })
-
-    // 获取相册
-    findAlbumList().then(res => {
-      this.albumList = res.data
-    })
+    this.getAblumList()
   },
   methods: {
     // 查找照片列表
@@ -151,11 +159,10 @@ export default {
     // 重置
     onReset () {
       this.albumId = ''
-      this.desc = ''
       this.searchLoading = false
     },
-    // 删除相册
-    deleteCategory (_id) {
+    // 删除
+    handleDelete (_id) {
       this.$q.dialog({
         title: '删除',
         message: '确定要删除该照片吗?',
@@ -166,17 +173,10 @@ export default {
           this.request({
             pagination: this.pagination
           })
-          // 删除成功
-          this.$q.notify({
-            message: res.msg,
-            color: 'primary'
-          })
+          this.$msg.success(res.msg)
         }).catch((err) => {
           throw new Error(err)
         })
-      }).onOk(() => {
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     // dialog 确认
@@ -187,20 +187,19 @@ export default {
       }
       addAlbum(params).then(res => {
         // 添加成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
-        this.onCancelClick()
+        this.$msg.success(res.msg)
+        this.cancelClick()
         this.request({
           pagination: this.pagination
         })
+        this.getAblumList()
       })
     },
     // dialog 取消
     cancelClick () {
       this.addDialogVisible = false
       this.name = ''
+      this.desc = ''
     },
     // Upload dialog 确认
     okUpload () {
@@ -212,33 +211,22 @@ export default {
       this.uploadAblum = ''
       this.uploadDialogVisible = false
     },
-    startUpload () {
-      console.log('startUpload')
-      if (!this.uploadAblum) {
-        return this.$q.notify({
-          icon: 'insert_emoticon',
-          message: '请先选择相册',
-          color: 'warning',
-          position: 'top',
-          timeout: 1500
-        })
-      }
-    },
-    // 上传图片事件
+    // 上传图片
     finishUpload (file) {
       const res = JSON.parse(file.xhr.response)
       if (res.code === 2000) {
-        // 上传成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
+        this.$msg.success(res.msg)
         this.request({
           pagination: this.pagination
         })
-        // 然后隐藏对话框
         this.uploadDialogVisible = false
       }
+    },
+    // 获取相册列表
+    getAblumList () {
+      findAlbumList().then(res => {
+        this.albumList = res.data
+      })
     }
   }
 }

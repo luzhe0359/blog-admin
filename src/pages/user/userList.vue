@@ -253,13 +253,7 @@ export default {
             pagination: this.pagination
           })
           // 删除成功
-          this.$q.notify({
-            icon: 'check',
-            message: res.msg,
-            color: 'green',
-            position: 'top',
-            timeout: 1500
-          })
+          this.$msg.success(res.msg)
         }).catch((err) => {
           throw new Error(err)
         })
@@ -279,10 +273,7 @@ export default {
       EditUserById(_id, { role: this.roleSelection }).then(res => {
         this.loading = false
         // 修改成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
+        this.$msg.success(res.msg)
         this.baseDialogVisible = false
       }).catch(() => {
         this.baseDialogVisible = false
@@ -306,13 +297,7 @@ export default {
             this.request({
               pagination: this.pagination
             })
-            this.$q.notify({
-              icon: 'check',
-              message: res.msg,
-              color: 'green',
-              position: 'top',
-              timeout: 1500
-            })
+            this.$msg.success(res.msg)
             this.addDialogVisible = false
           })
         }
@@ -334,10 +319,7 @@ export default {
       if (res.code === 2000) {
         this.uAvatar = res.data.url
         // 上传成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
+        this.$msg.success(res.msg)
 
         // 然后隐藏对话框
         this.uploadDialogVisible = false

@@ -6,7 +6,7 @@
         <!-- 搜索框 -->
         <q-card-section class="q-px-none q-py-sm">
           <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-y-sm row items-end" :class="{'q-gutter-sm':$q.screen.gt.sm}">
-            <q-input type="text" v-model="name" label="分类名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
+            <q-input type="text" v-model="searchName" label="分类名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
             <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading" :class="{'q-mr-sm':$q.screen.lt.md}">
               <template v-slot:loading>
                 <q-spinner-facebook />
@@ -14,7 +14,7 @@
             </q-btn>
             <q-btn label="重 置" type="reset" color="grey" />
             <q-space />
-            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="openDialog" />
+            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="showDialog" />
           </q-form>
         </q-card-section>
         <q-card-section class="q-pa-none">
@@ -38,7 +38,7 @@
             <!-- 表格内容 -操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
-                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="openDialog(props.row)" />
+                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="showDialog(props.row)" />
                 <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
                 <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
               </q-td>
@@ -65,8 +65,9 @@ export default {
   name: 'categoryList',
   data () {
     return {
+      searchName: '', // 搜索
       name: '', // 分类名称
-      icon: '',
+      icon: '', // 分类图标
       loading: true, // 表格loading
       pagination: {
         sortBy: 'createTime', // 排序方式, 按照哪个字段排序
@@ -130,8 +131,7 @@ export default {
     },
     // 重置
     onReset () {
-      this.name = ''
-      this.icon = ''
+      this.searchName = ''
       this.searchLoading = false
     },
     // 删除分类
@@ -147,67 +147,45 @@ export default {
             pagination: this.pagination
           })
           // 删除成功
-          this.$q.notify({
-            message: res.msg,
-            color: 'primary'
-          })
+          this.$msg.success(res.msg)
         }).catch((err) => {
           throw new Error(err)
         })
-      }).onOk(() => {
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
     // 展示弹框
-    openDialog ({ _id, name, icon }) {
+    showDialog ({ _id, name, icon }) {
       this.dialogVisible = true
       if (!_id) {
         this.dialogTitle = '添加'
         return
       }
+      this.dialogTitle = '编辑'
 
       this.categoryId = _id
       this.name = name
       this.icon = icon
-      this.dialogTitle = '编辑'
     },
     // dialog 确认
     okClick () {
+      const params = {
+        name: this.name,
+        icon: this.icon
+      }
+      // 添加
       if (this.dialogTitle === '添加') {
-        return this.add()
-      }
-      this.edit()
-    },
-    // 添加分类
-    add () {
-      const params = {
-        name: this.name,
-        icon: this.icon
-      }
-      addCategory(params).then(res => {
-        // 添加成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
+        addCategory(params).then(res => {
+          this.$msg.success(res.msg)
+          this.cancelClick()
+          this.request({
+            pagination: this.pagination
+          })
         })
-        this.cancelClick()
-        this.request({
-          pagination: this.pagination
-        })
-      })
-    },
-    edit () {
-      const params = {
-        name: this.name,
-        icon: this.icon
+        return
       }
+      // 编辑
       editCategoryById(this.categoryId, params).then(res => {
-        // 编辑成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
+        this.$msg.success(res.msg)
         this.cancelClick()
         this.request({
           pagination: this.pagination
@@ -216,10 +194,10 @@ export default {
     },
     // dialog 取消
     cancelClick () {
+      this.dialogVisible = false
       this.categoryId = ''
       this.name = ''
       this.icon = ''
-      this.dialogVisible = false
     }
   }
 }

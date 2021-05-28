@@ -49,7 +49,7 @@
         </q-form>
       </q-card>
       <!-- 头像上传 -->
-      <BaseDialog :title="'头像上传'" :dialogVisible="baseDialogVisible" @okClick="okClick" @cancelClick="cancelClick">
+      <BaseDialog :title="'头像上传'" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
         <template v-slot:body>
           <q-uploader :url="`${$url}/photo/upload`" :headers="[
               {name: 'Authorization', value: `Bearer ${token}`}
@@ -86,7 +86,7 @@ export default {
       loading: false,
       userId: null, // 用户id
       token: getToken(),
-      baseDialogVisible: false
+      dialogVisible: false
     }
   },
   created () {
@@ -116,10 +116,7 @@ export default {
         this.$store.commit('SET_AVATAR', user.avatar)
         this.$store.commit('SET_NICKNAME', user.nickname)
         // 保存成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
+        this.$msg.success(res.msg)
       }).catch(() => {
         this.loading = false
       })
@@ -136,7 +133,7 @@ export default {
     // 上传图片弹框
     uploadDialog () {
       if (this.readonly) return
-      this.baseDialogVisible = true
+      this.dialogVisible = true
     },
     // 上传图片事件
     finishUpload (file) {
@@ -144,22 +141,19 @@ export default {
       if (res.code === 2000) {
         this.$set(this.formData, 'avatar', res.data.url)
         // 上传成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
+        this.$msg.success(res.msg)
 
         // 然后隐藏对话框
-        this.baseDialogVisible = false
+        this.dialogVisible = false
       }
     },
     // dialog 确认
     okClick () {
-      this.baseDialogVisible = false
+      this.dialogVisible = false
     },
     // dialog 取消
     cancelClick () {
-      this.baseDialogVisible = false
+      this.dialogVisible = false
     }
   }
 }

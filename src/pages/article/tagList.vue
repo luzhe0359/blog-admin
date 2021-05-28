@@ -6,7 +6,7 @@
         <!-- 搜索框 -->
         <q-card-section class="q-px-none q-py-sm">
           <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-y-sm row items-end" :class="{'q-gutter-sm':$q.screen.gt.sm}">
-            <q-input type="text" v-model="name" label="标签名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
+            <q-input type="text" v-model="searchName" label="标签名称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
             <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading" :class="{'q-mr-sm':$q.screen.lt.md}">
               <template v-slot:loading>
                 <q-spinner-facebook />
@@ -14,7 +14,7 @@
             </q-btn>
             <q-btn label="重 置" type="reset" color="grey" />
             <q-space />
-            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="addDialogVisible = true" />
+            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="showDialog" />
           </q-form>
         </q-card-section>
         <q-card-section class="q-pa-none">
@@ -32,7 +32,7 @@
             <!-- 表格内容 -操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
-                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="addDialog(props.row._id, props.row.name)" />
+                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="showDialog(props.row)" />
                 <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteTag(props.row._id)" />
                 <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
               </q-td>
@@ -40,16 +40,14 @@
           </q-table>
         </q-card-section>
       </q-card>
-      <!-- 添加标签 -->
-      <BaseDialog :title="'添加'" :dialogVisible="addDialogVisible" @okClick="onOKClick" @cancelClick="onCancelClick">
+      <!-- 添加/编辑 -->
+      <BaseDialog :title="dialogTitle" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
         <template v-slot:body>
-          <q-input class="full-width" v-model="name" autofocus label="标签名称" />
-        </template>
-      </BaseDialog>
-      <!-- 编辑标签 -->
-      <BaseDialog :title="'编辑'" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
-        <template v-slot:body>
-          <q-input class="full-width" v-model="editName" autofocus label="标签名称" />
+          <q-input label="名称" outlined dense class="full-width" v-model="name" autofocus>
+            <template v-slot:prepend>
+              <q-icon name="bubble_chart" />
+            </template>
+          </q-input>
         </template>
       </BaseDialog>
     </div>
@@ -64,8 +62,8 @@ export default {
   name: 'tagList',
   data () {
     return {
+      searchName: '', // 搜索
       name: '', // 标签名称
-      editName: '',
       loading: true, // 表格loading
       pagination: {
         sortBy: 'createTime', // 排序方式, 按照哪个字段排序
@@ -89,7 +87,7 @@ export default {
       ],
       TagData: [], // 标签列表
       searchLoading: false, // 查询loading
-      addDialogVisible: false,
+      dialogTitle: '添加',
       dialogVisible: false,
       tagId: ''
     }
@@ -106,7 +104,7 @@ export default {
 
       this.loading = true
       const params = {
-        name: this.name,
+        name: this.searchName,
         pageNum: page,
         pageSize: rowsPerPage,
         sortBy: sortBy,
@@ -136,7 +134,7 @@ export default {
     },
     // 重置
     onReset () {
-      this.name = ''
+      this.searchName = ''
       this.searchLoading = false
     },
     // 删除标签
@@ -152,57 +150,43 @@ export default {
             pagination: this.pagination
           })
           // 删除成功
-          this.$q.notify({
-            message: res.msg,
-            color: 'primary'
-          })
+          this.$msg.success(res.msg)
         }).catch((err) => {
           throw new Error(err)
         })
-      }).onOk(() => {
-      }).onCancel(() => {
-      }).onDismiss(() => {
       })
     },
-    // dialog 确认
-    onOKClick () {
-      const params = {
-        name: this.name
-      }
-      addTag(params).then(res => {
-        // 添加成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
-        })
-        this.onCancelClick()
-        this.request({
-          pagination: this.pagination
-        })
-      })
-    },
-    // dialog 取消
-    onCancelClick () {
-      this.addDialogVisible = false
-      this.name = ''
-    },
-    addDialog (_id, name) {
-      this.tagId = _id
-      this.editName = name
+    // 展示弹框
+    showDialog ({ _id, name }) {
       this.dialogVisible = true
+      if (!_id) { // 有_id 为编辑，反之添加
+        this.dialogTitle = '添加'
+        return
+      }
+      this.dialogTitle = '编辑'
+
+      this.tagId = _id
+      this.name = name
     },
     // dialog 确认
     okClick () {
       const params = {
-        name: this.editName
+        name: this.name
       }
-
-      editTagById(this.tagId, params).then(res => {
-        // 编辑成功
-        this.$q.notify({
-          message: res.msg,
-          color: 'primary'
+      // 添加
+      if (this.dialogTitle === '添加') {
+        addTag(params).then(res => {
+          this.$msg.success(res.msg)
+          this.cancelClick()
+          this.request({
+            pagination: this.pagination
+          })
         })
+        return
+      }
+      // 编辑
+      editTagById(this.tagId, params).then(res => {
+        this.$msg.success(res.msg)
         this.cancelClick()
         this.request({
           pagination: this.pagination
@@ -211,9 +195,9 @@ export default {
     },
     // dialog 取消
     cancelClick () {
+      this.dialogVisible = false
       this.tagId = ''
       this.name = ''
-      this.dialogVisible = false
     }
   }
 }

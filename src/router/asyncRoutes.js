@@ -13,7 +13,7 @@ const asyncRoutesChildren = [
       icon: 'home',
       keepAlive: true
     },
-    component: () => import('pages/home/home')
+    component: () => import(/* webpackChunkName:"home" */ 'pages/home/home')
   },
   {
     path: '/async-router',
@@ -61,7 +61,7 @@ const asyncRoutesChildren = [
           icon: 'people',
           keepAlive: true
         },
-        component: () => import('pages/user/userList')
+        component: () => import(/* webpackChunkName:"user" */ 'pages/user/userList')
       },
       {
         path: 'info',
@@ -72,7 +72,7 @@ const asyncRoutesChildren = [
           icon: 'person',
           keepAlive: true
         },
-        component: () => import('pages/user/userInfo')
+        component: () => import(/* webpackChunkName:"user" */ 'pages/user/userInfo')
       }
     ]
   },
@@ -96,7 +96,7 @@ const asyncRoutesChildren = [
           icon: 'library_books',
           keepAlive: true
         },
-        component: () => import('pages/article/articleList')
+        component: () => import(/* webpackChunkName:"article" */ 'pages/article/articleList')
       },
       {
         path: 'write',
@@ -107,7 +107,7 @@ const asyncRoutesChildren = [
           icon: 'library_add',
           keepAlive: true
         },
-        component: () => import('pages/article/articleWrite')
+        component: () => import(/* webpackChunkName:"article" */ 'pages/article/articleWrite')
       },
       {
         path: 'detail/:_id?',
@@ -119,7 +119,18 @@ const asyncRoutesChildren = [
           keepAlive: true,
           isHidden: true
         },
-        component: () => import('pages/article/articleDetail')
+        component: () => import(/* webpackChunkName:"article" */ 'pages/article/articleDetail')
+      },
+      {
+        path: 'comment',
+        name: 'articleComment',
+        meta: {
+          roles: ['admin', 'editor'],
+          title: '文章评论',
+          icon: 'comment',
+          keepAlive: false
+        },
+        component: () => import(/* webpackChunkName:"article" */ 'pages/comment/commentList')
       },
       {
         path: 'category',
@@ -130,7 +141,7 @@ const asyncRoutesChildren = [
           icon: 'app_registration',
           keepAlive: true
         },
-        component: () => import('pages/article/categoryList')
+        component: () => import(/* webpackChunkName:"article" */ 'pages/article/categoryList')
       },
       {
         path: 'tag',
@@ -141,7 +152,7 @@ const asyncRoutesChildren = [
           icon: 'loyalty',
           keepAlive: true
         },
-        component: () => import('pages/article/tagList')
+        component: () => import(/* webpackChunkName:"article" */ 'pages/article/tagList')
       }
     ]
   },
@@ -166,7 +177,7 @@ const asyncRoutesChildren = [
           icon: 'photo_library',
           keepAlive: true
         },
-        component: () => import('../pages/photo/albumList')
+        component: () => import(/* webpackChunkName:"photo" */ '../pages/photo/albumList')
       },
       {
         path: 'list',
@@ -177,7 +188,7 @@ const asyncRoutesChildren = [
           icon: 'image',
           keepAlive: true
         },
-        component: () => import('../pages/photo/photoList')
+        component: () => import(/* webpackChunkName:"photo" */ '../pages/photo/photoList')
       }
     ]
   },
@@ -190,7 +201,7 @@ const asyncRoutesChildren = [
       icon: 'add_road',
       keepAlive: true
     },
-    component: () => import('../pages/timeline/timelineList')
+    component: () => import(/* webpackChunkName:"timeline" */ '../pages/timeline/timelineList')
   },
   {
     path: '/link',
@@ -201,7 +212,7 @@ const asyncRoutesChildren = [
       icon: 'all_inclusive',
       keepAlive: true
     },
-    component: () => import('../pages/link/linkList')
+    component: () => import(/* webpackChunkName:"link" */ '../pages/link/linkList')
   },
   {
     path: 'http://www.quasarchs.com/vue-components/button',
