@@ -5,17 +5,27 @@
       <q-card :bordered="false" style="box-shadow: none;">
         <!-- 搜索框 -->
         <q-card-section class="q-px-none q-py-sm">
-          <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-y-sm row items-end" :class="{'q-gutter-sm':$q.screen.gt.sm}">
-            <q-input type="text" v-model="username" label="用户名" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
-            <q-input type="text" v-model="nickname" label="昵称" class="col-lg-3 col-md-3 col-sm-6 col-xs-12" />
-            <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading" :class="{'q-mr-sm':$q.screen.lt.md}">
-              <template v-slot:loading>
-                <q-spinner-facebook />
-              </template>
-            </q-btn>
-            <q-btn label="重 置" type="reset" color="grey" />
+          <q-form @submit="onSubmit" @reset="onReset" class="q-col-gutter-sm row items-end">
+            <div class="col-lg-3 col-md-5 col-sm-6 col-xs-12">
+              <q-input type=" text" v-model="username" label="用户名" />
+            </div>
+            <div class="col-lg-3 col-md-5 col-sm-6 col-xs-12">
+              <q-input type="text" v-model="nickname" label="昵称" />
+            </div>
+            <div>
+              <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading">
+                <template v-slot:loading>
+                  <q-spinner-facebook />
+                </template>
+              </q-btn>
+            </div>
+            <div>
+              <q-btn label="重 置" type="reset" color="grey" />
+            </div>
             <q-space />
-            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="addDialogVisible = true" />
+            <div>
+              <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="addDialogVisible = true" />
+            </div>
           </q-form>
         </q-card-section>
         <q-card-section class="q-pa-none">

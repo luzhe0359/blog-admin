@@ -1,9 +1,10 @@
 <template>
-  <div id="ArticleWrite" class="q-pa-md column fit">
+  <div id="ArticleWrite" class="q-pa-md fit">
     <!-- markdown -->
-    <div class="col">
+    <div class="full-height">
       <q-no-ssr>
-        <mavon-editor ref="md" :toolbars="toolbars" v-model="post.mdContent" :ishljs="true" codeStyle="atelier-plateau-dark" @change="editorChange" @imgAdd="imgAdd" :tabSize="4" style="height: 100%; width: 100%;"></mavon-editor>
+        <v-md-editor height="100%" v-model="post.mdContent" :disabled-menus="[]" @upload-image="handleUploadImage" />
+        <!-- <mavon-editor ref="md" :toolbars="toolbars" v-model="post.mdContent" :ishljs="true" codeStyle="atelier-plateau-dark" @change="editorChange" @imgAdd="imgAdd" :tabSize="4" style="height: 100%; width: 100%;"></mavon-editor> -->
       </q-no-ssr>
     </div>
     <!-- 添加按钮(右下角) -->
@@ -82,7 +83,7 @@
 </template>
 
 <script>
-import { mavonEditor } from 'mavon-editor'
+// import { mavonEditor } from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 
 import BaseDialog from 'components/Dialog/BaseDialog.vue'
@@ -94,7 +95,7 @@ import { findCategoryList } from 'src/api/category.js'
 export default {
   name: 'articleWrite',
   components: {
-    mavonEditor,
+    // mavonEditor,
     BaseDialog
   },
   data () {
@@ -197,13 +198,30 @@ export default {
       this.post.htmlContent = render
     },
     // 添加图片
-    imgAdd (pos, $file) {
-      // 第一步.将图片上传到服务器.
+    // handleUploadImage (pos, $file) {
+    //   // 第一步.将图片上传到服务器.
+    //   var formdata = new FormData()
+    //   formdata.append('file', $file)
+
+    //   uploadImage(formdata).then(res => {
+    //     this.$refs.md.$img2Url(pos, this.$url + res.data.url)
+    //   })
+    // },
+    // 上传图片
+    handleUploadImage (event, insertImage, files) {
+      // 拿到 files 之后上传到文件服务器，然后向编辑框中插入对应的内容
       var formdata = new FormData()
-      formdata.append('file', $file)
+      formdata.append('photo', files[0])
 
       uploadImage(formdata).then(res => {
-        this.$refs.md.$img2Url(pos, this.$url + res.data.url)
+        // this.$refs.md.$img2Url(pos, this.$url + res.data.url)
+        // md插入图片
+        insertImage({
+          url: this.$url + res.data.url,
+          desc: res.data.name,
+          width: '50%',
+          height: '50%'
+        })
       })
     },
     // 保存

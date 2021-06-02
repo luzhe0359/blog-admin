@@ -1,8 +1,6 @@
 <template>
   <BaseContent>
     <div class="q-pa-md">
-      <!-- 面包屑 -->
-      <Breadcrumbs />
       <!-- 主体 -->
       <q-card :bordered="false" style="box-shadow: none;">
         <!-- 搜索框 -->
@@ -83,14 +81,12 @@
 
 <script>
 import { date } from 'quasar'
-import Breadcrumbs from 'components/Breadcrumbs/Breadcrumbs.vue'
 import CommentState from 'components/Comment/CommentState.vue'
 import { findCommentList, deleteCommentById, changeCommentState } from 'src/api/comment.js'
 
 export default {
   name: 'articleComment',
   components: {
-    Breadcrumbs,
     CommentState
   },
   data () {

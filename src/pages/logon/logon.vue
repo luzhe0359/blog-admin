@@ -58,35 +58,37 @@
       <div class="col flex justify-center items-center">
 
         <q-card square style="min-width: 290px;height: 100%; width: 60%;" class="no-shadow">
-          <q-card-section align="center">
-            <h3 class="text-uppercase">zugelu</h3>
-            <!-- 用户名 -->
-            <q-input class="logon-input q-electron-drag--exception" clearable standout="bg-cyan text-white" bottom-slots v-model.trim="username" label="账号" debounce='500' lazy-rules :rules="[
+          <q-form ref="logon">
+            <q-card-section align="center">
+              <h3 class="text-uppercase">zugelu</h3>
+              <!-- 用户名 -->
+              <q-input class="logon-input q-electron-drag--exception" clearable standout="bg-cyan text-white" bottom-slots v-model.trim="username" label="账号" debounce='500' lazy-rules :rules="[
                   val => (val && val.length > 0) || '请输入账号。',
                   val => (val.length >= 6 && val.length <= 12) || '请输入 6-12账号。',
                 ]">
-              <template v-slot:prepend>
-                <q-icon name="account_circle" />
-              </template>
-            </q-input>
-            <!-- 密码 -->
-            <q-input class="logon-input q-electron-drag--exception" standout="bg-cyan text-white" bottom-slots v-model.trim="password" label="密码" :type="isPwd ? 'password' : 'text'" hint="">
-              <template v-slot:prepend>
-                <q-icon name="vpn_key" />
-              </template>
-              <template v-slot:append>
-                <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd" />
-              </template>
-            </q-input>
+                <template v-slot:prepend>
+                  <q-icon name="account_circle" />
+                </template>
+              </q-input>
+              <!-- 密码 -->
+              <q-input class="logon-input q-electron-drag--exception" standout="bg-cyan text-white" bottom-slots v-model.trim="password" label="密码" :type="isPwd ? 'password' : 'text'" hint="">
+                <template v-slot:prepend>
+                  <q-icon name="vpn_key" />
+                </template>
+                <template v-slot:append>
+                  <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd" />
+                </template>
+              </q-input>
 
-            <!-- 登录按钮 -->
-            <q-btn :loading="loading" class="logon-btn bg-logon-card-input" text-color="white" unelevated label="" style="font-size: large;" @click="logon">登 录 系 统
-            </q-btn>
-            <div class="row justify-between" style="margin-bottom: 20px;">
-              <q-btn flat label="忘记密码" @click="forget" />
-              <q-btn outline label="我要注册" @click="forget" />
-            </div>
-          </q-card-section>
+              <!-- 登录按钮 -->
+              <q-btn :loading="loading" class="logon-btn bg-logon-card-input" text-color="white" unelevated label="" style="font-size: large;" @click="logon">登 录 系 统
+              </q-btn>
+              <div class="row justify-between" style="margin-bottom: 20px;">
+                <q-btn flat label="忘记密码" @click="forget" />
+                <q-btn outline label="我要注册" @click="forget" />
+              </div>
+            </q-card-section>
+          </q-form>
         </q-card>
       </div>
     </div>
@@ -119,31 +121,39 @@ export default {
     logon () {
       this.loading = !this.loading
 
-      this.$store.dispatch('Login', {
-        username: this.username,
-        password: aesEncrypt(this.password)
-      }).then((res) => {
-        const { token, user } = res
-        // 初始化 store
-        sessionStorage.setItem('access_token', token)
-        sessionStorage.setItem('user_role', 'admin')
-        sessionStorage.setItem('user_nickname', user.nickname)
-        sessionStorage.setItem('user_avatar', user.avatar)
-        sessionStorage.setItem('user_id', user._id)
-        this.$store.commit('SET_NICKNAME', user.nickname)
-        this.$store.commit('SET_AVATAR', user.avatar)
-        // 跳转
-        this.$router.push('/').then(e => {
-          this.$msg.success(`hi，${user.nickname} 欢迎回来`)
+      this.$refs.logon.validate().then(success => {
+        // 校验不通过
+        if (!success) {
           this.loading = !this.loading
-          // 如果是 electron 则改变窗口大小
-          if (process.env.MODE === 'electron') {
-            this.$q.electron.remote.getCurrentWindow().setSize(1023, 768)
-            this.$q.electron.remote.getCurrentWindow().center()
-          }
+          return
+        }
+
+        this.$store.dispatch('Login', {
+          username: this.username,
+          password: aesEncrypt(this.password)
+        }).then((res) => {
+          const { token, user } = res
+          // 初始化 store
+          sessionStorage.setItem('access_token', token)
+          sessionStorage.setItem('user_role', 'admin')
+          sessionStorage.setItem('user_nickname', user.nickname)
+          sessionStorage.setItem('user_avatar', user.avatar)
+          sessionStorage.setItem('user_id', user._id)
+          this.$store.commit('SET_NICKNAME', user.nickname)
+          this.$store.commit('SET_AVATAR', user.avatar)
+          // 跳转
+          this.$router.push('/').then(e => {
+            this.$msg.success(`hi，${user.nickname} 欢迎回来`)
+            this.loading = !this.loading
+            // 如果是 electron 则改变窗口大小
+            if (process.env.MODE === 'electron') {
+              this.$q.electron.remote.getCurrentWindow().setSize(1023, 768)
+              this.$q.electron.remote.getCurrentWindow().center()
+            }
+          })
+        }).catch(() => {
+          this.loading = false
         })
-      }).catch(() => {
-        this.loading = false
       })
     },
     handleFinish (e) {

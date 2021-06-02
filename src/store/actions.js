@@ -17,10 +17,10 @@ const actions = {
     Logout ({ commit }, state) {
         return new Promise((resolve, reject) => {
             userLogout().then((response) => {
-                // commit('LOGOUT')
+                commit('LOGOUT')
                 resolve()
             }).catch(error => {
-                // commit('LOGOUT')
+                commit('LOGOUT')
                 reject(error)
             })
         })
