@@ -68,7 +68,7 @@
           </q-input>
           <div class="row no-wrap q-py-md">
             <div class="text-subtitle1 q-mr-md ">logo</div>
-            <q-uploader :url="`${$url}/photo/upload`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
+            <q-uploader :url="`${$url}/api/photo/upload`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
         ]" field-name='photo' multiple batch max-files="1" @uploaded="finishUpload" style="width:200px; height: 200px;" />
           </div>
         </template>

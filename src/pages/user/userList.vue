@@ -128,7 +128,7 @@
       <!-- 头像上传 -->
       <BaseDialog :title="'头像上传'" :dialogVisible="uploadDialogVisible" :hideAction="true" @okClick="okUploadClick" @cancelClick="cancelUploadClick">
         <template v-slot:body>
-          <q-uploader :url="`${$url}/photo/upload`" :headers="[
+          <q-uploader :url="`${$url}/api/photo/upload`" :headers="[
               {name: 'Authorization', value: `Bearer ${token}`}
             ]" field-name='photo' max-files="1" style="width:100%; height: 500px;" @uploaded="finishUpload" />
         </template>
@@ -151,7 +151,7 @@
 
 <script>
 import { date } from 'quasar'
-import { findUserList, EditUserById, deleteUserById, userRegister } from 'src/api/user.js'
+import { findUserList, editUserById, deleteUserById, userRegister } from 'src/api/user.js'
 import { aesEncrypt } from 'src/utils/crypto.js'
 
 export default {
@@ -164,7 +164,7 @@ export default {
       uName: '', // 用户名(注册)
       uPwd: '', // 密码(注册)
       uNickname: '',
-      uAvatar: '/images/default_avatar.jpg', // 默认头像
+      uAvatar: '/images/default_avatar.webp', // 默认头像
       isPwd: true,
       loading: true, // 表格loading
       pagination: {
@@ -280,7 +280,7 @@ export default {
     // dialog 确认
     okClick () {
       const { _id } = this.user
-      EditUserById(_id, { role: this.roleSelection }).then(res => {
+      editUserById(_id, { role: this.roleSelection }).then(res => {
         this.loading = false
         // 修改成功
         this.$msg.success(res.msg)

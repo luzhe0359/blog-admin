@@ -41,15 +41,16 @@
             <template v-slot:body="props">
               <q-tr :props="props">
                 <q-td>
-                  <q-btn size="sm" color="primary" round dense @click="props.expand = !props.expand" :icon="props.expand ? 'remove' : 'add'" />
+                  <q-btn v-if="props.row.otherComments.length > 0" size="sm" color="primary" round flat dense @click="props.expand = !props.expand" :icon="props.expand ? 'remove' : 'add'" />
                 </q-td>
                 <q-td v-for="col in props.cols" :key="col.name" :props="props">
                   {{ col.value }}
                 </q-td>
                 <!-- 表体 操作列 -->
                 <q-td class="row justify-center items-center no-wrap">
-                  <CommentState :state="props.row.state" @stateChange="changeState($event, props.row)" />
-                  <q-btn icon="delete" size="sm" flat dense @click="deleteComment(props.row._id)" />
+                  <CommentState v-if="isZugelu" :state="props.row.state" @stateChange="changeState($event, props.row)" />
+                  <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteComment(props.row._id)" />
+                  <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
                 </q-td>
               </q-tr>
               <!-- 子评论 -->
@@ -67,8 +68,9 @@
                 <q-td class="text-center"> {{ child.createTime | dateFormat }} </q-td>
                 <!-- 操作 -->
                 <q-td class="row justify-center items-center no-wrap">
-                  <CommentState :state="child.state" @stateChange="changeState($event, props.row, child._id)" />
-                  <q-btn icon="delete" size="sm" flat dense @click="$q.notify('请删除上级评论 .')" />
+                  <CommentState v-if="isZugelu" :state="child.state" @stateChange="changeState($event, props.row, child._id)" />
+                  <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="$q.notify('请删除上级评论 .')" />
+                  <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
                 </q-td>
               </q-tr>
             </template>

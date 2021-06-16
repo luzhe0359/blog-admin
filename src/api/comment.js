@@ -1,5 +1,5 @@
 /**
- * @FileDescription: 分类API
+ * @FileDescription: 评论API
  * @Author: zugelu
  * @qq: 1141178844
  */

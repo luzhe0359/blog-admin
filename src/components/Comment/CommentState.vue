@@ -1,6 +1,6 @@
 <template>
   <div class="q-mr-sm">
-    <q-btn-dropdown color="grey" size="sm" :label="stateOptions[state]">
+    <q-btn-dropdown color="grey-8" dense flat :label="stateOptions[state]">
       <q-list>
         <q-item clickable v-close-popup @click="onItemClick(0)">
           <q-item-section>

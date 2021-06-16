@@ -26,5 +26,6 @@ Vue.prototype.$buttonList = [
   { text: 'Quasar', URL: 'http://www.quasarchs.com/' },
   { text: 'Github', URL: 'https://github.com/luzhe0359/blog_admin' },
   { text: 'Gitee', URL: 'https://gitee.com/lzzz0359/blog_admin' },
-  { text: '关于作者', URL: '/' }
+  { text: '关于作者', URL: '/' },
+  { text: '晋ICP备2021010367号', URL: 'https://beian.miit.gov.cn/' }
 ]

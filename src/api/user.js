@@ -1,5 +1,5 @@
 /**
- * @FileDescription: 时间线API
+ * @FileDescription: 用户API
  * @Author: zugelu
  * @qq: 1141178844
  */
@@ -63,7 +63,7 @@ export const findUserById = _id => {
  * @param {String} about 用户个人简介
  * @param {Array} role 用户角色 ['admin','editor']
  */
-export const EditUserById = (_id, params) => {
+export const editUserById = (_id, params) => {
     return axios.put(`/user/${_id}`, params)
 }
 
@@ -73,12 +73,4 @@ export const EditUserById = (_id, params) => {
  */
 export const deleteUserById = _id => {
     return axios.delete(`/user/${_id}`)
-}
-
-/**
- * @description: 校验用户名 是否已存在
- * @param {String} username 用户名
- */
-export const findUsername = params => {
-    return axios.get('/user', { params })
 }

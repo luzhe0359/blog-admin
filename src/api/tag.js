@@ -18,7 +18,7 @@ export const findTagList = params => {
 }
 
 /**
- * @description: 添加单个标签
+ * @description: 添加标签
  * @param {String} name 标签名称
  */
 export const addTag = params => {

@@ -51,7 +51,7 @@
       <!-- 头像上传 -->
       <BaseDialog :title="'头像上传'" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
         <template v-slot:body>
-          <q-uploader :url="`${$url}/photo/upload`" :headers="[
+          <q-uploader :url="`${$url}/api/photo/upload`" :headers="[
               {name: 'Authorization', value: `Bearer ${token}`}
             ]" field-name='photo' max-files="1" style="width:100%; height: 500px;" @uploaded="finishUpload" />
         </template>
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { findUserById, EditUserById } from 'src/api/user.js'
+import { findUserById, editUserById } from 'src/api/user.js'
 // import { uploadImage } from 'src/api/photo.js'
 import { getToken } from 'src/utils/auth.js'
 
@@ -106,7 +106,7 @@ export default {
     // 保存
     onSubmit () {
       this.loading = true
-      EditUserById(this.userId, this.formData).then(res => {
+      editUserById(this.userId, this.formData).then(res => {
         this.loading = false
         const user = res.data
         for (const key in this.formData) {

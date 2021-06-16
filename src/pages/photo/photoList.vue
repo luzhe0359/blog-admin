@@ -69,7 +69,7 @@
               <q-icon name="photo_library" />
             </template>
           </q-select>
-          <q-uploader v-show="uploadAblum" :url="`${$url}/photo/uploads?albumId=${uploadAblum}`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
+          <q-uploader v-show="uploadAblum" :url="`${$url}/api/photo/uploads?albumId=${uploadAblum}`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
         ]" field-name='photo' multiple batch max-files="10" @uploaded="finishUpload" style="width:100%; height: 500px;" />
         </template>
       </BaseDialog>

@@ -47,7 +47,7 @@ module.exports = function (ctx) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      publicPath: '/zugelu/',
+      publicPath: '/admin/',
       vueRouterMode: process.env.NODE_ENV === 'production' ? 'history' : 'hash', // available values: 'hash', 'history'
 
       // transpile: false,
@@ -83,7 +83,7 @@ module.exports = function (ctx) {
       env: {
         URL: ctx.dev
           ? 'http://127.0.0.1:3000'
-          : 'http://www.zugelu.com:3000/'
+          : 'https://zugelu.com'
       }
     },
 

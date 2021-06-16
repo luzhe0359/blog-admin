@@ -225,17 +225,6 @@ const asyncRoutesChildren = [
     }
   },
   {
-    path: '/tableDetail',
-    name: 'tableDetail',
-    meta: {
-      roles: ['admin', 'editor'],
-      title: 'Treats 详情',
-      icon: 'blur_linear',
-      isHidden: true
-    },
-    component: () => import('../pages/home/tableDetail')
-  },
-  {
     path: '*', // 此处需置于最底部
     redirect: '/NoFound404',
     meta: {

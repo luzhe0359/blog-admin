@@ -1,5 +1,5 @@
 <template>
-  <q-btn flat no-caps no-wrap class="q-ml-xs" v-if="$q.screen.gt.xs">
+  <q-btn flat no-caps no-wrap class="q-ml-xs gt-xs" @click="toFront">
     <q-toolbar-title shrink class="text-weight-bold">
       {{title}}
     </q-toolbar-title>
@@ -12,6 +12,11 @@ export default {
   data () {
     return {
       title: 'ZUGELU'
+    }
+  },
+  methods: {
+    toFront () {
+      window.open('https://zugelu.com')
     }
   }
 }

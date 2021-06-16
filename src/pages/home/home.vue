@@ -70,33 +70,20 @@
       <div class="row q-col-gutter-md">
         <div class="col-xs-12 col-md-3">
           <q-card class="cimo-shadow" style="height: 430px; width: 100%; padding: 3px">
-            <v-chart class="" :options="chartPie" autoresize />
+            <v-chart class="" :options="categoryPie" autoresize />
           </q-card>
         </div>
         <div class="col-xs-12 col-md-3">
           <q-card class="my-card cimo-shadow">
-            <q-img :src="this.$PUBLIC_PATH + 'data/bird.jpg'" />
+            <q-img :src="this.$PUBLIC_PATH + 'data/front.webp'" />
             <q-card-section>
-              <!-- <div class="text-overline text-orange-9">Overline</div> -->
-              <div class="text-h5 q-mt-sm q-mb-xs">hello</div>
+              <div class="text-h5 q-mt-sm q-mb-xs">Welcome My Friends！</div>
+              <div class="text-subtitle1">这是我的博客首页，怎么样，感觉还不错吧？点击下方链接去瞄一眼！</div>
             </q-card-section>
             <q-card-actions>
-              <q-btn flat color="dark" label="Share" />
-              <q-btn flat color="primary" label="Book" />
-
               <q-space />
-
-              <q-btn color="grey" round flat dense :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'" @click="expanded = !expanded" />
+              <q-btn flat color="primary" label="足各路の博客" />
             </q-card-actions>
-
-            <q-slide-transition>
-              <div v-show="expanded">
-                <q-separator />
-                <q-card-section class="text-subitle2">
-                  {{ lorem }}
-                </q-card-section>
-              </div>
-            </q-slide-transition>
           </q-card>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -129,6 +116,7 @@
 
 <script>
 import countTo from 'vue-count-to'
+import category from '../../assets/js/category'
 import chartPie from '../../assets/js/echarts-1'
 import charts2Option from '../../assets/js/echarts-2'
 import { income, expense, total } from '../../assets/js/echarts-3'
@@ -145,6 +133,7 @@ export default {
     return {
       expanded: false,
       chartPie,
+      categoryPie: null,
       chartZ,
       charts2Option,
       income,
@@ -269,13 +258,19 @@ export default {
     handleCountArticle () {
       countArticle().then((res) => {
         this.count = res.data
+        category.series[0].data = res.data.category.map(c => {
+          return {
+            name: c.name, value: c.count
+          }
+        }).sort((a, b) => { return a.value - b.value })
+        this.categoryPie = category
         //         comments: 2
         // likes: 7
         // total: 6
         // views: 25
       })
       console.log('this.chartPie')
-      console.log(this.chartPie)
+      console.log(this.category)
     }
   }
 }
@@ -356,5 +351,13 @@ export default {
 .btn-table:hover {
   background-position: right center;
   box-shadow: 0 12px 20px -11px #5b86e5;
+}
+
+.q-img {
+  z-index: 999;
+  transition: all 0.5s ease;
+}
+.q-img:hover {
+  transform: scale(1.1);
 }
 </style>

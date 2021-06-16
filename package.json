@@ -1,8 +1,8 @@
 {
-  "name": "zugelu_blog_admin",
+  "name": "blog_admin",
   "version": "0.0.1",
   "description": "zugelu - 博客后台管理系统",
-  "productName": "zugelu_blog_admin",
+  "productName": "zugelu - 博客后台管理系统",
   "author": "zugelu <luzhe0359@163.com>",
   "private": true,
   "scripts": {

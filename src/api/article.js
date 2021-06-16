@@ -46,7 +46,7 @@ export const findArticleById = (_id, params) => {
  * @param {ObjectId} _id 文章_id
  * @param {Object} body 同：添加文章API
  */
-export const EditArticleById = (_id, params) => {
+export const editArticleById = (_id, params) => {
     return axios.put(`/article/${_id}`, params)
 }
 
