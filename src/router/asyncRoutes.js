@@ -8,7 +8,7 @@ const asyncRoutesChildren = [
     path: '/',
     name: 'home',
     meta: {
-      roles: ['admin', 'editor', 'test'],
+      roles: ['super', 'admin', 'editor'],
       title: '主页',
       icon: 'home',
       keepAlive: true
@@ -19,7 +19,7 @@ const asyncRoutesChildren = [
     path: '/async-router',
     name: 'asyncRouter',
     meta: {
-      roles: ['admin', 'editor'],
+      roles: ['super', 'admin', 'editor'],
       title: '动态路由',
       icon: 'all_inclusive',
       itemLabel: 'ROUTER',
@@ -32,7 +32,7 @@ const asyncRoutesChildren = [
     path: '/async-router-impl',
     name: 'asyncRouterImpl',
     meta: {
-      roles: ['admin', 'editor'],
+      roles: ['super', 'admin', 'editor'],
       title: '动态路由实现思路',
       icon: 'auto_awesome',
       keepAlive: true,
@@ -44,7 +44,7 @@ const asyncRoutesChildren = [
     path: '/user',
     name: 'user',
     meta: {
-      roles: ['admin', 'editor'],
+      roles: ['super', 'admin', 'editor'],
       title: '用户管理',
       // itemLabel: '主菜单',
       icon: 'person_search', // manage_accounts
@@ -56,7 +56,7 @@ const asyncRoutesChildren = [
         path: 'list',
         name: 'userList',
         meta: {
-          roles: ['admin', 'editor'],
+          roles: ['super', 'admin', 'editor'],
           title: '用户列表',
           icon: 'people',
           keepAlive: true
@@ -67,7 +67,7 @@ const asyncRoutesChildren = [
         path: 'info',
         name: 'userInfo',
         meta: {
-          roles: ['admin', 'editor'],
+          roles: ['super', 'admin', 'editor'],
           title: '个人中心',
           icon: 'person',
           keepAlive: true
@@ -80,7 +80,7 @@ const asyncRoutesChildren = [
     path: '/article',
     name: 'article',
     meta: {
-      roles: ['admin', 'editor'],
+      roles: ['super', 'admin', 'editor'],
       title: '文章管理',
       icon: 'auto_awesome_motion',
       isOpen: false
@@ -91,7 +91,7 @@ const asyncRoutesChildren = [
         path: 'list',
         name: 'articleList',
         meta: {
-          roles: ['admin', 'editor'],
+          roles: ['super', 'admin', 'editor'],
           title: '文章列表',
           icon: 'library_books',
           keepAlive: true
@@ -102,7 +102,7 @@ const asyncRoutesChildren = [
         path: 'write',
         name: 'articleWrite',
         meta: {
-          roles: ['admin', 'editor'],
+          roles: ['super', 'admin', 'editor'],
           title: '文章编写',
           icon: 'library_add',
           keepAlive: true
@@ -113,7 +113,7 @@ const asyncRoutesChildren = [
         path: 'detail/:_id?',
         name: 'articleDetail',
         meta: {
-          roles: ['admin', 'editor'],
+          roles: ['super', 'admin', 'editor'],
           title: '文章详情',
           icon: 'article',
           keepAlive: true,
@@ -125,7 +125,7 @@ const asyncRoutesChildren = [
         path: 'comment',
         name: 'articleComment',
         meta: {
-          roles: ['admin', 'editor'],
+          roles: ['super', 'admin', 'editor'],
           title: '文章评论',
           icon: 'comment',
           keepAlive: false
@@ -136,7 +136,7 @@ const asyncRoutesChildren = [
         path: 'category',
         name: 'articleCategory',
         meta: {
-          roles: ['admin', 'editor'],
+          roles: ['super', 'admin', 'editor'],
           title: '文章分类',
           icon: 'app_registration',
           keepAlive: true
@@ -147,7 +147,7 @@ const asyncRoutesChildren = [
         path: 'tag',
         name: 'articleTag',
         meta: {
-          roles: ['admin', 'editor'],
+          roles: ['super', 'admin', 'editor'],
           title: '文章标签',
           icon: 'loyalty',
           keepAlive: true
@@ -160,7 +160,7 @@ const asyncRoutesChildren = [
     path: '/photo',
     name: 'photo',
     meta: {
-      roles: ['admin', 'editor'],
+      roles: ['super', 'admin', 'editor'],
       title: '照片管理',
       // itemLabel: 'SOME LABEL',
       icon: 'image_search',
@@ -172,7 +172,7 @@ const asyncRoutesChildren = [
         path: 'album',
         name: 'photoAlbum',
         meta: {
-          roles: ['admin', 'editor'],
+          roles: ['super', 'admin', 'editor'],
           title: '相册列表',
           icon: 'photo_library',
           keepAlive: true
@@ -183,7 +183,7 @@ const asyncRoutesChildren = [
         path: 'list',
         name: 'photoList',
         meta: {
-          roles: ['admin', 'editor'],
+          roles: ['super', 'admin', 'editor'],
           title: '照片列表',
           icon: 'image',
           keepAlive: true
@@ -196,7 +196,7 @@ const asyncRoutesChildren = [
     path: '/timeline',
     name: 'timeline',
     meta: {
-      roles: ['admin', 'editor'],
+      roles: ['super', 'admin', 'editor'],
       title: '时间总轴',
       icon: 'add_road',
       keepAlive: true
@@ -207,7 +207,7 @@ const asyncRoutesChildren = [
     path: '/link',
     name: 'link',
     meta: {
-      roles: ['admin', 'editor'],
+      roles: ['super', 'admin', 'editor'],
       title: '友情链接',
       icon: 'all_inclusive',
       keepAlive: true
@@ -215,10 +215,21 @@ const asyncRoutesChildren = [
     component: () => import(/* webpackChunkName:"link" */ '../pages/link/linkList')
   },
   {
+    path: '/message',
+    name: 'message',
+    meta: {
+      roles: ['super', 'admin', 'editor'],
+      title: '留点什么',
+      icon: 'spellcheck',
+      keepAlive: true
+    },
+    component: () => import(/* webpackChunkName:"message" */ '../pages/message/messageList')
+  },
+  {
     path: 'http://www.quasarchs.com/vue-components/button',
     name: 'external-link',
     meta: {
-      roles: ['admin', 'editor'],
+      roles: ['super', 'admin', 'editor'],
       title: '外部链接/更多组件',
       icon: 'send',
       isHidden: true
@@ -228,7 +239,7 @@ const asyncRoutesChildren = [
     path: '*', // 此处需置于最底部
     redirect: '/NoFound404',
     meta: {
-      roles: ['admin', 'test'],
+      roles: ['super', 'admin', 'editor', 'visitor'],
       isHidden: true
     }
   }

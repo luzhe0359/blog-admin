@@ -9,7 +9,7 @@
             <span class="label-title q-mb-sm">头像</span>
             <div>
               <q-avatar size="100px">
-                <q-img :disable="!readonly" :src="formData.avatar | imgBaseUrl" spinner-color="primary" class="border-radius50 " :class="!readonly && 'cursor-pointer'" width='100px' height='100px' @click="uploadDialog">
+                <q-img :disable="!readonly" :src="formData.avatar | imgBaseUrl" :placeholder-src="'/images/logo.webp' | imgBaseUrl" spinner-color="primary" class="border-radius50 " :class="!readonly && 'cursor-pointer'" width='100px' height='100px' @click="uploadDialog">
                   <div v-show="!readonly" class="absolute-bottom text-subtitle2 text-center">
                     更换头像
                   </div>
@@ -25,7 +25,8 @@
 
           <q-input label="昵称" :readonly="readonly" v-model="formData.nickname" lazy-rules :rules="[
             val => val && val.length > 0 || '请输入昵称',
-            val => (val.length >= 2 && val.length <= 6) || '请输入2-6位昵称'
+            val => (val.length >= 2 && val.length <= 6) || '请输入2-6位昵称',
+            hasNicknameCheck
           ]" />
 
           <q-input label="年龄" type="number" :readonly="readonly" v-model="formData.age" lazy-rules :rules="[
@@ -61,7 +62,7 @@
 </template>
 
 <script>
-import { findUserById, editUserById } from 'src/api/user.js'
+import { findUserById, editUserById, hasNickname } from 'src/api/user.js'
 // import { uploadImage } from 'src/api/photo.js'
 import { getToken } from 'src/utils/auth.js'
 
@@ -77,6 +78,7 @@ export default {
         avatar: '',
         about: ''
       },
+      oldUserInfo: {},
       genderOptions: [
         { label: '男', value: 1 },
         { label: '女', value: 0 },
@@ -98,6 +100,7 @@ export default {
       this.userId = sessionStorage.getItem('user_id')
       findUserById(this.userId).then(res => {
         const user = res.data
+        this.oldUserInfo = user
         for (const key in this.formData) {
           this.formData[key] = user[key]
         }
@@ -154,6 +157,17 @@ export default {
     // dialog 取消
     cancelClick () {
       this.dialogVisible = false
+    },
+    // 校验昵称
+    hasNicknameCheck (val) {
+      if (this.oldUserInfo.nickname === val) {
+        return true
+      }
+      return new Promise((resolve, reject) => {
+        hasNickname({ nickname: val }).then(res => {
+          resolve(res.data.length <= 0 || '昵称已存在')
+        })
+      })
     }
   }
 }

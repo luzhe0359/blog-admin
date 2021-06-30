@@ -14,13 +14,13 @@
             </q-btn>
             <q-btn label="重 置" type="reset" color="grey" />
             <q-space />
-            <q-btn v-if="isZugelu" label="上 传" type="button" color="secondary" @click="uploadDialogVisible = true" :class="{'q-mr-sm':$q.screen.lt.md}" />
-            <q-btn v-if="isZugelu" label="添 加" type="button" color="secondary" @click="addDialogVisible = true" />
+            <q-btn v-if="hasBtnPermissions" label="上 传" type="button" color="secondary" @click="uploadDialogVisible = true" :class="{'q-mr-sm':$q.screen.lt.md}" />
+            <q-btn v-if="hasBtnPermissions" label="添 加" type="button" color="secondary" @click="addDialogVisible = true" />
           </q-form>
         </q-card-section>
         <q-card-section class="q-pa-none">
           <!-- 表格 -->
-          <q-table color="primary" :bordered="false" card-style="box-shadow: none;" row-key="id" :data="photoData" :columns="CategoryColumns" :loading="loading" :pagination.sync="pagination" rows-per-page-label="每页条数:" :rows-per-page-options="[5, 10, 20, 50, 0]" :pagination-label="(firstRowIndex, endRowIndex, totalRowsNumber) => `${firstRowIndex}-${endRowIndex} / ${totalRowsNumber}`" no-data-label="很抱歉, 没有查询到您想要的结果 . . ." @request="request" binary-state-sort>
+          <q-table color="primary" :bordered="false" card-style="box-shadow: none;" row-key="_id" :data="photoData" :columns="CategoryColumns" :loading="loading" :pagination.sync="pagination" rows-per-page-label="每页条数:" :rows-per-page-options="[5, 10, 20, 50, 0]" :pagination-label="(firstRowIndex, endRowIndex, totalRowsNumber) => `${firstRowIndex}-${endRowIndex} / ${totalRowsNumber}`" no-data-label="很抱歉, 没有查询到您想要的结果 . . ." @request="request" binary-state-sort>
             <!-- 无数据 -插槽 -->
             <template v-slot:no-data="{ message }">
               <div class="full-width row flex-center q-gutter-sm text-warning">
@@ -39,8 +39,8 @@
             <!-- 表格内容 -操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
-                <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="handleDelete(props.row._id)" />
-                <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
+                <q-btn v-if="hasBtnPermissions" icon="delete" size="sm" flat dense @click="handleDelete(props.row._id)" />
+                <q-btn v-if="!hasBtnPermissions" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
               </q-td>
             </template>
           </q-table>
@@ -99,7 +99,7 @@ export default {
         rowsNumber: 10 // 总行数
       },
       CategoryColumns: [
-        { name: 'id', label: '序号', field: 'id', align: 'left' },
+        { name: 'name', label: '名称', field: 'name', align: 'left' },
         { name: 'url', label: '图片', field: 'url', align: 'center' },
         { name: 'size', label: '大小', field: 'size', align: 'center', format: val => ((val / 1024).toFixed(2) + 'kb') },
         { name: 'type', label: '类型', field: 'type', align: 'center' },

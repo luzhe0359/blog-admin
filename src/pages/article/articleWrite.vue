@@ -3,12 +3,12 @@
     <!-- markdown -->
     <div class="full-height">
       <q-no-ssr>
-        <v-md-editor height="100%" v-model="post.mdContent" :disabled-menus="[]" @upload-image="handleUploadImage" />
+        <v-md-editor height="100%" v-model="post.mdContent" :left-toolbar="leftToolbar" :disabled-menus="[]" @upload-image="handleUploadImage" />
       </q-no-ssr>
     </div>
     <!-- 添加按钮(右下角) -->
     <q-page-sticky position="bottom-right" style="z-index: 3000" :offset="[20,50]" @click="showDialog">
-      <q-btn padding="md" round color="primary" icon="eco" />
+      <q-btn padding="md" round color="green" icon="edit" />
     </q-page-sticky>
     <!-- 添加文章 -->
     <BaseDialog :title="'添加文章'" :dialogVisible="articleDialog" @okClick="okClick" @cancelClick="articleDialog = false">
@@ -82,9 +82,6 @@
 </template>
 
 <script>
-// import { mavonEditor } from 'mavon-editor'
-import 'mavon-editor/dist/css/index.css'
-
 import BaseDialog from 'components/Dialog/BaseDialog.vue'
 import { uploadImage } from 'src/api/photo.js'
 import { addArticle, findArticleById, editArticleById } from 'src/api/article.js'
@@ -94,11 +91,11 @@ import { findCategoryList } from 'src/api/category.js'
 export default {
   name: 'articleWrite',
   components: {
-    // mavonEditor,
     BaseDialog
   },
   data () {
     return {
+      leftToolbar: 'undo redo clear | h bold italic strikethrough quote | ul ol table hr | link image code | todo-list',
       post: {
         title: '',
         desc: '',

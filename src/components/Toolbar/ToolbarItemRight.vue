@@ -31,7 +31,7 @@
 
           <div class="column items-center">
             <q-avatar size="72px">
-              <q-img no-default-spinner transition="slide-down" :src="getAvatar | imgBaseUrl" :placeholder-src="'/images/default_avatar.jpg' | imgBaseUrl" />
+              <q-img no-default-spinner transition="slide-down" :src="getAvatar | imgBaseUrl" :placeholder-src="'/images/logo.webp' | imgBaseUrl" />
             </q-avatar>
 
             <div class="text-subtitle1 q-mt-md q-mb-xs">Hi！<br> {{getNickname}}</div>
@@ -41,7 +41,7 @@
         </div>
       </q-menu>
       <q-avatar size="26px">
-        <q-img no-default-spinner transition="slide-down" :src="getAvatar | imgBaseUrl" :placeholder-src="'/images/default_avatar.jpg' | imgBaseUrl" />
+        <q-img no-default-spinner transition="slide-down" :src="getAvatar | imgBaseUrl" :placeholder-src="'/images/logo.webp' | imgBaseUrl" />
       </q-avatar>
       <q-tooltip>账号</q-tooltip>
     </q-btn>

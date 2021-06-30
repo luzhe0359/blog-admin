@@ -21,7 +21,7 @@ export default async ({ app, router, Vue, store }) => {
     // There is a token indicating that you have logged in
     if (token) {
       // You cannot access the login interface after logging in
-      if (to.path === '/login') {
+      if (to.path === '/logon') {
         next({ path: '/' })
       }
       // There is user authority, and the route is not empty, then let go

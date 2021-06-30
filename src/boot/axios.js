@@ -107,7 +107,6 @@ const toLogin = async (msg) => {
  * @param {Number} status 状态码
  */
 const errorHandle = (status, msg) => {
-    console.log(status)
     // 状态码判断
     switch (status) {
         // 2001: 账号已存在
@@ -120,7 +119,7 @@ const errorHandle = (status, msg) => {
             break
         // 2003: 用户名/密码错误
         case 2003:
-            tip('权限不足，请联系管理员!')
+            tip(msg)
             break
         // 4001: token无效/未登录状态，跳转登录页
         case 4001:

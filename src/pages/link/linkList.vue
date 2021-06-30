@@ -14,12 +14,12 @@
             </q-btn>
             <q-btn label="重 置" type="reset" color="grey" />
             <q-space />
-            <q-btn label="添 加" v-if="isZugelu" type="button" color="secondary" @click="showDialog" />
+            <q-btn label="添 加" v-if="hasBtnPermissions" type="button" color="secondary" @click="showDialog" />
           </q-form>
         </q-card-section>
         <q-card-section class="q-pa-none">
           <!-- 表格 -->
-          <q-table color="primary" :bordered="false" card-style="box-shadow: none;" row-key="id" :data="linkData" :columns="columns" :loading="loading" :pagination.sync="pagination" rows-per-page-label="每页条数:" :rows-per-page-options="[5, 10, 20, 50, 0]" :pagination-label="(firstRowIndex, endRowIndex, totalRowsNumber) => `${firstRowIndex}-${endRowIndex} / ${totalRowsNumber}`" no-data-label="很抱歉, 没有查询到您想要的结果 . . ." @request="request" binary-state-sort>
+          <q-table color="primary" :bordered="false" card-style="box-shadow: none;" row-key="_id" :data="linkData" :columns="columns" :loading="loading" :pagination.sync="pagination" rows-per-page-label="每页条数:" :rows-per-page-options="[5, 10, 20, 50, 0]" :pagination-label="(firstRowIndex, endRowIndex, totalRowsNumber) => `${firstRowIndex}-${endRowIndex} / ${totalRowsNumber}`" no-data-label="很抱歉, 没有查询到您想要的结果 . . ." @request="request" binary-state-sort>
             <!-- 无数据 -插槽 -->
             <template v-slot:no-data="{ message }">
               <div class="full-width row flex-center q-gutter-sm text-warning">
@@ -29,20 +29,32 @@
                 </span>
               </div>
             </template>
-            <!-- 表格内容 -头像插槽 -->
+            <!-- 表格内容 -图标插槽 -->
             <template v-slot:body-cell-logo="props">
               <q-td :props="props">
                 <q-avatar round size="48px">
-                  <q-img no-default-spinner transition="slide-down" :src="`${$url}${props.row.logo}`" :placeholder-src="'/images/default_avatar.jpg' | imgBaseUrl" />
+                  <q-img no-default-spinner transition="slide-down" :src="`${$url}${props.row.logo}`" :placeholder-src="'/images/logo.webp' | imgBaseUrl" />
                 </q-avatar>
+              </q-td>
+            </template>
+            <!-- 表格内容 -置顶插槽 -->
+            <template v-slot:body-cell-isTop="props">
+              <q-td :props="props">
+                <q-toggle v-model="props.row.isTop" color="primary" keep-color @input="toggleHandler($event,props.row, 'isTop')" />
+              </q-td>
+            </template>
+            <!-- 表格内容 -停用插槽 -->
+            <template v-slot:body-cell-isStop="props">
+              <q-td :props="props">
+                <q-toggle v-model="props.row.isStop" color="primary" keep-color @input="toggleHandler($event,props.row, 'isStop')" />
               </q-td>
             </template>
             <!-- 表格内容 -操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
-                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense @click="showDialog(props.row)" />
-                <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
-                <q-btn v-if="!isZugelu" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
+                <q-btn v-if="hasBtnPermissions" icon="edit" size="sm" flat dense @click="showDialog(props.row)" />
+                <q-btn v-if="hasBtnPermissions" icon="delete" size="sm" flat dense @click="deleteCategory(props.row._id)" />
+                <q-btn v-if="!hasBtnPermissions" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
               </q-td>
             </template>
           </q-table>
@@ -58,19 +70,19 @@
           </q-input>
           <q-input label="链接" outlined dense class="full-width" v-model="url">
             <template v-slot:prepend>
-              <q-icon name="attachment" />
+              <q-icon class="rotate-135" name="attachment" />
             </template>
           </q-input>
-          <q-input label="描述" outlined dense class="full-width" v-model="desc" maxlength='22'>
+          <q-input label="描述" outlined dense class="full-width" v-model="desc" maxlength='20'>
             <template v-slot:prepend>
               <q-icon name="create" />
             </template>
           </q-input>
-          <div class="row no-wrap q-py-md">
-            <div class="text-subtitle1 q-mr-md ">logo</div>
-            <q-uploader :url="`${$url}/api/photo/upload`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
-        ]" field-name='photo' multiple batch max-files="1" @uploaded="finishUpload" style="width:200px; height: 200px;" />
-          </div>
+          <q-input label="logo" outlined dense class="full-width" v-model="logo">
+            <template v-slot:prepend>
+              <q-icon name="flutter_dash" />
+            </template>
+          </q-input>
         </template>
       </BaseDialog>
     </div>
@@ -80,13 +92,11 @@
 <script>
 import { findLinkList, addLink, editLinkById, deleteLinkById } from 'src/api/link.js'
 import { date } from 'quasar'
-import { getToken } from 'src/utils/auth.js'
 
 export default {
   name: 'linkList',
   data () {
     return {
-      token: getToken(),
       searchTitle: '', // 搜索
       title: '', // 友链名称
       desc: '', // 友链描述
@@ -105,6 +115,8 @@ export default {
         { name: 'desc', label: '简介', field: 'desc', align: 'center' },
         { name: 'logo', label: '图标', field: 'logo', align: 'center' },
         { name: 'url', label: '链接', field: 'url', align: 'center' },
+        { name: 'isTop', label: '置顶', field: 'isTop', align: 'center', sortable: true },
+        { name: 'isStop', label: '停用', field: 'isStop', align: 'center' },
         { name: 'createTime', label: '创建时间', field: 'createTime', align: 'center', sortable: true, format: val => date.formatDate(val, 'YYYY-MM-DD HH:mm:ss') },
         { name: 'action', label: '操作', field: 'action', align: 'center' }
       ],
@@ -181,17 +193,6 @@ export default {
       }).onDismiss(() => {
       })
     },
-    // 上传图片事件
-    finishUpload (file) {
-      const res = JSON.parse(file.xhr.response)
-      this.logo = res.data.url
-      if (res.code === 2000) {
-        // 上传成功
-        this.$msg.success(res.msg)
-        // 然后隐藏对话框
-        this.avatarDialog = false
-      }
-    },
     // 展示弹框
     showDialog ({ _id, title, url, desc, logo }) {
       this.dialogVisible = true
@@ -243,6 +244,36 @@ export default {
       this.url = ''
       this.desc = ''
       this.logo = ''
+    },
+    // 是否置顶
+    toggleHandler (toggle, row, param) {
+      const cancel = toggle ? '' : '取消'
+      const TopOrStop = param === 'isTop' ? '置顶' : '停用'
+      this.$q.dialog({
+        title: '编辑',
+        message: `确定要${cancel}${TopOrStop}该条友链吗？`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        this.loading = true
+        const params = {}
+        params[param] = toggle
+        console.log(params)
+        // 编辑
+        editLinkById(row._id, params).then(res => {
+          this.loading = false
+          this.$msg.success(res.msg)
+        }).catch(() => {
+          this.loading = false
+        })
+      }).onOk(() => {
+        // console.log('>>>> second OK catcher')
+      }).onCancel(() => {
+        // console.log('>>>> Cancel')
+        row.isTop = !toggle
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
     }
   }
 }

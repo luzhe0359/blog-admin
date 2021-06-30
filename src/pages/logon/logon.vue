@@ -135,7 +135,7 @@ export default {
           const { token, user } = res
           // 初始化 store
           sessionStorage.setItem('access_token', token)
-          sessionStorage.setItem('user_role', 'admin')
+          sessionStorage.setItem('user_role', user.role)
           sessionStorage.setItem('user_nickname', user.nickname)
           sessionStorage.setItem('user_avatar', user.avatar)
           sessionStorage.setItem('user_id', user._id)

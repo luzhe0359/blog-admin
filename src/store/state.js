@@ -6,6 +6,6 @@ export default function () {
     breadcrumbs: [],
     keepAliveList: [],
     nickname: '',
-    avatar: '/images/default_avatar.jpeg'
+    avatar: '/images/logo.jpeg'
   }
 }

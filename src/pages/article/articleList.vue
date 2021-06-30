@@ -17,7 +17,7 @@
         </q-card-section>
         <q-card-section class="q-pa-none">
           <!-- 表格 -->
-          <q-table color="primary" :bordered="false" card-style="box-shadow: none;" row-key="id" :data="articleData" :columns="ArticleColumns" :loading="loading" :pagination.sync="pagination" rows-per-page-label="每页条数:" :rows-per-page-options="[5, 10, 20, 50, 0]" :pagination-label="(firstRowIndex, endRowIndex, totalRowsNumber) => `${firstRowIndex}-${endRowIndex} / ${totalRowsNumber}`" no-data-label="很抱歉, 没有查询到您想要的结果 . . ." @request="request" binary-state-sort>
+          <q-table color="primary" :bordered="false" card-style="box-shadow: none;" row-key="_id" :data="articleData" :columns="ArticleColumns" :loading="loading" :pagination.sync="pagination" rows-per-page-label="每页条数:" :rows-per-page-options="[5, 10, 20, 50, 0]" :pagination-label="(firstRowIndex, endRowIndex, totalRowsNumber) => `${firstRowIndex}-${endRowIndex} / ${totalRowsNumber}`" no-data-label="很抱歉, 没有查询到您想要的结果 . . ." @request="request" binary-state-sort>
             <!-- 无数据 -插槽 -->
             <template v-slot:no-data="{ message }">
               <div class="full-width row flex-center q-gutter-sm text-warning">
@@ -52,8 +52,8 @@
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
                 <q-btn icon="search" size="sm" flat dense :to="`/article/detail/${props.row._id}`" />
-                <q-btn v-if="isZugelu" icon="edit" size="sm" flat dense :to="{name:'articleWrite',query:{_id:props.row._id}}" />
-                <q-btn v-if="isZugelu" icon="delete" size="sm" flat dense @click="deleteArticle(props.row._id)" />
+                <q-btn v-if="isAuthor(props.row.author._id) || hasBtnPermissions" icon="edit" size="sm" flat dense :to="{name:'articleWrite',query:{_id:props.row._id}}" />
+                <q-btn v-if="hasBtnPermissions" icon="delete" size="sm" flat dense @click="deleteArticle(props.row._id)" />
               </q-td>
             </template>
           </q-table>
@@ -101,6 +101,13 @@ export default {
     this.request({
       pagination: this.pagination
     })
+  },
+  computed: {
+    isAuthor () {
+      return function (_id) {
+        return _id === sessionStorage.getItem('user_id')
+      }
+    }
   },
   methods: {
     // 查找用户列表

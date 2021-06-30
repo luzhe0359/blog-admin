@@ -264,7 +264,6 @@ const option = {
       show: true,
       position: 'outside',
       formatter: function (params) {
-        console.log(params)
         const name = params.name
         const value = params.value
         const percent = params.percent + '%'

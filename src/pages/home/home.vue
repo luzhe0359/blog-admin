@@ -82,7 +82,7 @@
             </q-card-section>
             <q-card-actions>
               <q-space />
-              <q-btn flat color="primary" label="足各路の博客" />
+              <q-btn flat color="primary" label="足各路の博客" @click="toFront" />
             </q-card-actions>
           </q-card>
         </div>
@@ -247,12 +247,6 @@ export default {
   },
   methods: {
     handleTableClick (e) {
-      this.$router.push({
-        path: 'tableDetail',
-        query: {
-          id: e.name
-        }
-      })
     },
     // 文章信息统计
     handleCountArticle () {
@@ -269,8 +263,9 @@ export default {
         // total: 6
         // views: 25
       })
-      console.log('this.chartPie')
-      console.log(this.category)
+    },
+    toFront () {
+      window.open('https://zugelu.com')
     }
   }
 }

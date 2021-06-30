@@ -12,8 +12,9 @@ export default {
     },
     computed: {
         // 最高权限(博主)
-        isZugelu () {
-            return sessionStorage.getItem('user_id') === '60aa4d94e18bfd3eb4b0ac27'
+        hasBtnPermissions () {
+            const role = sessionStorage.getItem('user_role')
+            return ['super', 'admin'].includes(role)
         }
     },
     methods: {
