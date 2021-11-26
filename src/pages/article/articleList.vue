@@ -22,19 +22,25 @@
             <template v-slot:no-data="{ message }">
               <div class="full-width row flex-center q-gutter-sm text-warning">
                 <q-icon v-show="!loading" size="2em" name="sentiment_dissatisfied" />
-                <span>
-                  {{ message }}
-                </span>
+                <span>{{ message }}</span>
               </div>
             </template>
             <!-- 表格内容 -->
+            <!-- 头像插槽 -->
+            <template v-slot:body-cell-imgCover="props">
+              <q-td :props="props">
+                <q-avatar rounded size="80px">
+                  <q-img no-default-spinner transition="slide-down" :src="props.row.imgCover" :placeholder-src="$BASE_IMG_URL" />
+                </q-avatar>
+              </q-td>
+            </template>
             <!-- 文章类型 -->
             <template v-slot:body-cell-type="props">
               <q-td :props="props">
                 {{props.row.type | articleType}}
               </q-td>
             </template>
-            <!-- 文章类型 -->
+            <!-- 文章状态 -->
             <template v-slot:body-cell-state="props">
               <q-td :props="props">
                 {{props.row.state | articleState}}
@@ -46,6 +52,13 @@
                 <q-chip outline :size="$q.screen.lt.sm ? 'sm':'md'" color="primary" v-for="item in props.row.tags" :key="item._id">
                   {{item.name}}
                 </q-chip>
+              </q-td>
+            </template>
+            <!-- 文章标签 -->
+            <!-- 置顶插槽 -->
+            <template v-slot:body-cell-isTop="props">
+              <q-td :props="props">
+                <q-toggle v-model="props.row.isTop" color="primary" keep-color @input="toggleHandler($event,props.row)" />
               </q-td>
             </template>
             <!-- 操作插槽 -->
@@ -65,7 +78,7 @@
 
 <script>
 import { date } from 'quasar'
-import { findArticleList, deleteArticleById } from 'src/api/article.js'
+import { findArticleList, editArticleById, deleteArticleById } from 'src/api/article.js'
 
 export default {
   name: 'articleList',
@@ -83,6 +96,7 @@ export default {
       ArticleColumns: [
         { name: 'title', required: true, label: '标题', align: 'left', field: 'title', sortable: true },
         { name: 'category', label: '分类', field: 'category', align: 'center', format: val => val && val.name },
+        { name: 'imgCover', label: '封面', field: 'imgCover', align: 'center' },
         { name: 'tags', label: '标签', field: 'tags', align: 'center' },
         { name: 'type', label: '类型', field: 'type', align: 'center' },
         { name: 'state', label: '发布状态', field: 'state', align: 'center' },
@@ -90,6 +104,7 @@ export default {
         { name: 'meta.likes', label: '点赞数', field: 'meta', align: 'center', sortable: true, format: val => val && val.likes },
         { name: 'meta.comments', label: '评论数', field: 'meta', align: 'center', sortable: true, format: val => val && val.comments },
         { name: 'meta.views', label: '浏览量', field: 'meta', align: 'center', sortable: true, format: val => val && val.views },
+        { name: 'isTop', label: '置顶', field: 'isTop', align: 'center', sortable: true },
         { name: 'createTime', label: '创建时间', field: 'createTime', align: 'center', sortable: true, format: val => date.formatDate(val, 'YYYY-MM-DD HH:mm:ss') },
         { name: 'action', label: '操作', field: 'action', align: 'center' }
       ],
@@ -110,7 +125,7 @@ export default {
     }
   },
   methods: {
-    // 查找用户列表
+    // 查找文章列表
     request (props) {
       const { page, rowsPerPage, sortBy, descending } = props.pagination
 
@@ -149,7 +164,7 @@ export default {
       this.title = ''
       this.searchLoading = false
     },
-    // 删除标签
+    // 删除文章
     deleteArticle (_id) {
       this.$q.dialog({
         title: '删除',
@@ -165,6 +180,32 @@ export default {
         }).catch((err) => {
           throw new Error(err)
         })
+      })
+    },
+    // 是否置顶
+    toggleHandler (toggle, row) {
+      const cancel = toggle ? '' : '取消'
+      this.$q.dialog({
+        title: '编辑',
+        message: `确定要${cancel}置顶该条友链吗？`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        this.loading = true
+        // 编辑
+        editArticleById(row._id, { isTop: toggle }).then(res => {
+          this.loading = false
+          this.$msg.success(res.msg)
+        }).catch(() => {
+          this.loading = false
+        })
+      }).onOk(() => {
+        // console.log('>>>> second OK catcher')
+      }).onCancel(() => {
+        // console.log('>>>> Cancel')
+        row.isTop = !toggle
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
       })
     }
   }

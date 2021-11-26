@@ -39,8 +39,13 @@ body,
     background-color: rgba(97, 97, 97, .3)
 }
 
-// 头像高度100%
+// 头像高度100%(上传)
 .q-uploader__file--img {
+  height: 100%;
+}
+
+// 头像高度100%
+.q-avatar .q-img {
   height: 100%;
 }
 

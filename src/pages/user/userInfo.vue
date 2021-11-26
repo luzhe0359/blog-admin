@@ -4,12 +4,11 @@
       <!-- 个人信息 -->
       <q-card class="q-py-md no-box-shadow">
         <q-form @submit="onSubmit" class="q-gutter-sm">
-
           <div class="column">
             <span class="label-title q-mb-sm">头像</span>
             <div>
-              <q-avatar size="100px">
-                <q-img :disable="!readonly" :src="formData.avatar | imgBaseUrl" :placeholder-src="'/images/logo.webp' | imgBaseUrl" spinner-color="primary" class="border-radius50 " :class="!readonly && 'cursor-pointer'" width='100px' height='100px' @click="uploadDialog">
+              <q-avatar round size="100px">
+                <q-img :disable="!readonly" :src="formData.avatar" :placeholder-src="$BASE_IMG_URL" spinner-color="primary" transition="slide-down" :class="!readonly && 'cursor-pointer'" @click="uploadDialog">
                   <div v-show="!readonly" class="absolute-bottom text-subtitle2 text-center">
                     更换头像
                   </div>
@@ -17,7 +16,6 @@
               </q-avatar>
             </div>
           </div>
-
           <div class="column">
             <span class="label-title q-mb-sm">性别</span>
             <q-option-group inline :disable="readonly" label="性别" v-model="formData.gender" :options="genderOptions" color="primary" />
@@ -50,9 +48,9 @@
         </q-form>
       </q-card>
       <!-- 头像上传 -->
-      <BaseDialog :title="'头像上传'" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
+      <BaseDialog :title="'头像上传'" :hideAction="true" :dialogVisible="dialogVisible" @okClick="okClick" @cancelClick="cancelClick">
         <template v-slot:body>
-          <q-uploader :url="`${$url}/api/photo/upload`" :headers="[
+          <q-uploader :url="`${$url}/api/photo/upload?classify=avatar`" :headers="[
               {name: 'Authorization', value: `Bearer ${token}`}
             ]" field-name='photo' max-files="1" style="width:100%; height: 500px;" @uploaded="finishUpload" />
         </template>
@@ -63,7 +61,6 @@
 
 <script>
 import { findUserById, editUserById, hasNickname } from 'src/api/user.js'
-// import { uploadImage } from 'src/api/photo.js'
 import { getToken } from 'src/utils/auth.js'
 
 export default {
@@ -88,7 +85,8 @@ export default {
       loading: false,
       userId: null, // 用户id
       token: getToken(),
-      dialogVisible: false
+      dialogVisible: false,
+      client: null
     }
   },
   created () {
@@ -118,6 +116,8 @@ export default {
         this.readonly = true
         this.$store.commit('SET_AVATAR', user.avatar)
         this.$store.commit('SET_NICKNAME', user.nickname)
+        sessionStorage.setItem('user_avatar', user.avatar)
+        sessionStorage.setItem('user_nickname', user.nickname)
         // 保存成功
         this.$msg.success(res.msg)
       }).catch(() => {
@@ -145,7 +145,6 @@ export default {
         this.$set(this.formData, 'avatar', res.data.url)
         // 上传成功
         this.$msg.success(res.msg)
-
         // 然后隐藏对话框
         this.dialogVisible = false
       }

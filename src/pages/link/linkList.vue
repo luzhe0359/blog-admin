@@ -29,27 +29,28 @@
                 </span>
               </div>
             </template>
-            <!-- 表格内容 -图标插槽 -->
+            <!-- 表格内容 -->
+            <!-- 图标插槽 -->
             <template v-slot:body-cell-logo="props">
               <q-td :props="props">
-                <q-avatar round size="48px">
-                  <q-img no-default-spinner transition="slide-down" :src="`${$url}${props.row.logo}`" :placeholder-src="'/images/logo.webp' | imgBaseUrl" />
+                <q-avatar round size="80px">
+                  <q-img no-default-spinner transition="slide-down" :src="props.row.logo" :placeholder-src="$BASE_IMG_URL" />
                 </q-avatar>
               </q-td>
             </template>
-            <!-- 表格内容 -置顶插槽 -->
+            <!-- 置顶插槽 -->
             <template v-slot:body-cell-isTop="props">
               <q-td :props="props">
                 <q-toggle v-model="props.row.isTop" color="primary" keep-color @input="toggleHandler($event,props.row, 'isTop')" />
               </q-td>
             </template>
-            <!-- 表格内容 -停用插槽 -->
+            <!-- 停用插槽 -->
             <template v-slot:body-cell-isStop="props">
               <q-td :props="props">
                 <q-toggle v-model="props.row.isStop" color="primary" keep-color @input="toggleHandler($event,props.row, 'isStop')" />
               </q-td>
             </template>
-            <!-- 表格内容 -操作插槽 -->
+            <!-- 操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
                 <q-btn v-if="hasBtnPermissions" icon="edit" size="sm" flat dense @click="showDialog(props.row)" />
@@ -245,7 +246,7 @@ export default {
       this.desc = ''
       this.logo = ''
     },
-    // 是否置顶
+    // 是否置顶/停用
     toggleHandler (toggle, row, param) {
       const cancel = toggle ? '' : '取消'
       const TopOrStop = param === 'isTop' ? '置顶' : '停用'

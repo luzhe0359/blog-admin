@@ -23,12 +23,11 @@
           <template v-slot:no-data="{ message }">
             <div class="full-width row flex-center q-gutter-sm text-warning">
               <q-icon v-show="!loading" size="2em" name="sentiment_dissatisfied" />
-              <span>
-                {{ message }}
-              </span>
+              <span>{{ message }}</span>
             </div>
           </template>
-          <!-- 表格内容 -操作插槽 -->
+          <!-- 表格内容 -->
+          <!-- 操作插槽 -->
           <template v-slot:body-cell-action="props">
             <q-td :props="props" class="q-gutter-x-sm">
               <q-btn v-if="hasBtnPermissions" icon="edit" size="sm" flat dense @click="showDialog(props.row)" />

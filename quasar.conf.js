@@ -19,10 +19,9 @@ module.exports = function (ctx) {
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
     boot: [
-      'i18n',
       'axios',
       'main',
-      'permission' // 将 permissionWithDynamicRouter（后端传回的动态路由鉴权工具） 替换 permission （默认前端鉴权工具）
+      'permission' // permission （默认前端鉴权工具）
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -45,10 +44,15 @@ module.exports = function (ctx) {
       'material-icons' // optional, you are not bound to it
     ],
 
+    vendor: {
+      add: [],
+      remove: ['echarts', 'vue-echarts', 'axios']
+    },
+
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       publicPath: '/admin/',
-      vueRouterMode: process.env.NODE_ENV === 'production' ? 'history' : 'hash', // available values: 'hash', 'history'
+      vueRouterMode: ctx.prod ? 'history' : 'hash', // available values: 'hash', 'history'
 
       // transpile: false,
 
@@ -76,6 +80,20 @@ module.exports = function (ctx) {
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
           exclude: /node_modules/
+        })
+      },
+
+      chainWebpack (chain) {
+        chain.when(ctx.prod, config => {
+          // 使用externals设置排除项
+          config.set('externals', {
+            vue: 'Vue',
+            vuex: 'Vuex',
+            'vue-router': 'VueRouter',
+            axios: 'axios',
+            'lottie-web': 'lottie',
+            'crypto-js': 'CryptoJS'
+          })
         })
       },
 
@@ -135,11 +153,8 @@ module.exports = function (ctx) {
         'LoadingBar', // 加载栏
         'Dialog', // alert/comfirm/prompt
         'Notify', // 弹框toast
-        // 'Cookies',
-        // 'QAjaxBar',
         'TouchPan',
         'QMenu'
-        // 'LocalStorage' // 本地存储
       ]
     },
 

@@ -21,9 +21,9 @@
         <q-chip color="primary" text-color="white" v-for="tag in article.tags" :key="tag._id">{{tag.name}}</q-chip>
       </div>
       <!-- markdown -->
-      <div>
+      <div class="base-card-shadow">
         <q-no-ssr>
-          <mavon-editor :value="article.mdContent" :subfield="false" :defaultOpen="'preview'" :toolbarsFlag="false" :editable="false" :scrollStyle="true" :ishljs="true" style="height: 100%; width: 100%;"></mavon-editor>
+          <v-md-editor v-model="article.mdContent" mode="preview" :disabled-menus="[]" />
         </q-no-ssr>
       </div>
       <!-- 标签 -->
@@ -32,17 +32,10 @@
 </template>
 
 <script>
-import { mavonEditor } from 'mavon-editor'
-import 'mavon-editor/dist/css/index.css'
-
-// import { uploadImage } from 'src/api/photo.js'
 import { findArticleById } from 'src/api/article.js'
 
 export default {
   name: 'articleDetail',
-  components: {
-    mavonEditor
-  },
   data () {
     return {
       article: ''

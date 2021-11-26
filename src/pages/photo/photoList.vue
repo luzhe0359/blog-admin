@@ -25,18 +25,19 @@
             <template v-slot:no-data="{ message }">
               <div class="full-width row flex-center q-gutter-sm text-warning">
                 <q-icon v-show="!loading" size="2em" name="sentiment_dissatisfied" />
-                <span>
-                  {{ message }}
-                </span>
+                <span>{{ message }}</span>
               </div>
             </template>
-            <!-- 文章标签 -->
+            <!-- 表格内容 -->
+            <!-- 图片 -->
             <template v-slot:body-cell-url="props">
               <q-td :props="props">
-                <q-img :src="props.row.url | imgBaseUrl" spinner-color="white" style="width: 120px;height: 120px;" />
+                <q-avatar rounded size="80px">
+                  <q-img transition="slide-down" :src="props.row.url" :placeholder-src="$BASE_IMG_URL" spinner-color="white" />
+                </q-avatar>
               </q-td>
             </template>
-            <!-- 表格内容 -操作插槽 -->
+            <!-- 操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
                 <q-btn v-if="hasBtnPermissions" icon="delete" size="sm" flat dense @click="handleDelete(props.row._id)" />
@@ -69,7 +70,7 @@
               <q-icon name="photo_library" />
             </template>
           </q-select>
-          <q-uploader v-show="uploadAblum" :url="`${$url}/api/photo/uploads?albumId=${uploadAblum}`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
+          <q-uploader v-show="uploadAblum" :url="`${$url}/api/photo/uploads?albumId=${uploadAblum}&classify=album`" :headers="[ {name: 'Authorization', value: `Bearer ${token}`}
         ]" field-name='photo' multiple batch max-files="10" @uploaded="finishUpload" style="width:100%; height: 500px;" />
         </template>
       </BaseDialog>

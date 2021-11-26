@@ -5,7 +5,6 @@
 import '../components/ECharts/EChartsConfig'
 import '../components/Markdown/Markdown'
 import '../quasar.manage.config'
-import '../axios/FetchData'
 import './notify' // quasar 设置默认值
 import './filter'
 

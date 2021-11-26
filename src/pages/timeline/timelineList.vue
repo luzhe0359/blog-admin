@@ -29,7 +29,8 @@
                 </span>
               </div>
             </template>
-            <!-- 表格内容 -操作插槽 -->
+            <!-- 表格内容 -->
+            <!-- 操作插槽 -->
             <template v-slot:body-cell-action="props">
               <q-td :props="props" class="q-gutter-x-sm">
                 <q-btn v-if="hasBtnPermissions" icon="edit" size="sm" flat dense @click="showDialog(props.row)" />

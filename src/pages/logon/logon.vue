@@ -11,9 +11,8 @@
           <q-card-section align="center">
             <h3 class="text-uppercase">zugelu</h3>
             <!-- 用户名 -->
-            <q-input class="logon-input" autofocus clearable standout="bg-cyan text-white" bottom-slots v-model="username" label="账号" debounce='500' lazy-rules :rules="[
-                  val => (val && val.length > 0) || '请输入账号。',
-                  val => (val.length >= 6 && val.length <= 12) || '请输入 6-12 位账号。',
+            <q-input class="logon-input" autofocus clearable standout="bg-cyan text-white" bottom-slots v-model="account" label="账号" debounce='500' lazy-rules :rules="[
+                  val => (val && val.length > 0) || '请输入用户名或邮箱',
                 ]">
               <template v-slot:prepend>
                 <q-icon name="account_circle" />
@@ -21,8 +20,8 @@
             </q-input>
             <!-- 密码 -->
             <q-input class="logon-input" standout="bg-cyan text-white" bottom-slots v-model="password" label="密码" :type="isPwd ? 'password' : 'text'" hint="" debounce='200' lazy-rules :rules="[
-                  val => (val && val.length > 0) || '请输入密码。',
-                  val => (val.length >= 8 && val.length <= 16) || '请输入 8-16 位账号。',
+                  val => (val && val.length > 0) || '请输入密码',
+                  val => (val.length >= 8 && val.length <= 16) || '请输入 8-16 位账号',
                   passwordStrengthCheck
                 ]">
               <template v-slot:prepend>
@@ -62,9 +61,8 @@
             <q-card-section align="center">
               <h3 class="text-uppercase">zugelu</h3>
               <!-- 用户名 -->
-              <q-input class="logon-input q-electron-drag--exception" clearable standout="bg-cyan text-white" bottom-slots v-model.trim="username" label="账号" debounce='500' lazy-rules :rules="[
-                  val => (val && val.length > 0) || '请输入账号。',
-                  val => (val.length >= 6 && val.length <= 12) || '请输入 6-12账号。',
+              <q-input class="logon-input q-electron-drag--exception" clearable standout="bg-cyan text-white" bottom-slots v-model.trim="account" label="账号" debounce='500' lazy-rules :rules="[
+                  val => (val && val.length > 0) || '请输入账号',
                 ]">
                 <template v-slot:prepend>
                   <q-icon name="account_circle" />
@@ -113,6 +111,7 @@ export default {
         path: 'https://assets9.lottiefiles.com/packages/lf20_vo0a1yca.json',
         loop: true
       },
+      account: '',
       loading: false,
       isLottieF: false
     }
@@ -120,7 +119,6 @@ export default {
   methods: {
     logon () {
       this.loading = !this.loading
-
       this.$refs.logon.validate().then(success => {
         // 校验不通过
         if (!success) {
@@ -129,7 +127,7 @@ export default {
         }
 
         this.$store.dispatch('Login', {
-          username: this.username,
+          account: this.account,
           password: aesEncrypt(this.password)
         }).then((res) => {
           const { token, user } = res

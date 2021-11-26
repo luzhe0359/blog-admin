@@ -16,31 +16,6 @@ const asyncRoutesChildren = [
     component: () => import(/* webpackChunkName:"home" */ 'pages/home/home')
   },
   {
-    path: '/async-router',
-    name: 'asyncRouter',
-    meta: {
-      roles: ['super', 'admin', 'editor'],
-      title: '动态路由',
-      icon: 'all_inclusive',
-      itemLabel: 'ROUTER',
-      keepAlive: true,
-      isHidden: true
-    },
-    component: () => import('pages/router/asyncRouter')
-  },
-  {
-    path: '/async-router-impl',
-    name: 'asyncRouterImpl',
-    meta: {
-      roles: ['super', 'admin', 'editor'],
-      title: '动态路由实现思路',
-      icon: 'auto_awesome',
-      keepAlive: true,
-      isHidden: true
-    },
-    component: () => import('pages/router/asyncRouterImpl')
-  },
-  {
     path: '/user',
     name: 'user',
     meta: {
@@ -70,7 +45,7 @@ const asyncRoutesChildren = [
           roles: ['super', 'admin', 'editor'],
           title: '个人中心',
           icon: 'person',
-          keepAlive: true
+          keepAlive: false
         },
         component: () => import(/* webpackChunkName:"user" */ 'pages/user/userInfo')
       }
@@ -224,16 +199,6 @@ const asyncRoutesChildren = [
       keepAlive: true
     },
     component: () => import(/* webpackChunkName:"message" */ '../pages/message/messageList')
-  },
-  {
-    path: 'http://www.quasarchs.com/vue-components/button',
-    name: 'external-link',
-    meta: {
-      roles: ['super', 'admin', 'editor'],
-      title: '外部链接/更多组件',
-      icon: 'send',
-      isHidden: true
-    }
   },
   {
     path: '*', // 此处需置于最底部

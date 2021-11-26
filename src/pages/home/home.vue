@@ -82,7 +82,7 @@
             </q-card-section>
             <q-card-actions>
               <q-space />
-              <q-btn flat color="primary" label="足各路の博客" @click="toFront" />
+              <q-btn icon="refresh" flat color="primary" label="足各路の博客" @click="toFront" />
             </q-card-actions>
           </q-card>
         </div>
@@ -252,7 +252,7 @@ export default {
     handleCountArticle () {
       countArticle().then((res) => {
         this.count = res.data
-        category.series[0].data = res.data.category.map(c => {
+        category.series[0].data = res.data.categorys.map(c => {
           return {
             name: c.name, value: c.count
           }

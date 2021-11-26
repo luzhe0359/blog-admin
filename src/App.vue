@@ -10,7 +10,7 @@ export default {
 </script>
 
 <style>
-  @import "./assets/css/main.css";
-  @import './assets/css/transition.css';
-  @import "./assets/css/cimo.css";
+@import "./assets/css/main.css";
+@import "./assets/css/transition.css";
+@import "./assets/css/cimo.css";
 </style>

@@ -27,7 +27,8 @@
                 </span>
               </div>
             </template>
-            <!-- 表格内容 -扩展行插槽 -->
+            <!-- 表格内容 -->
+            <!-- 扩展行插槽 -->
             <template v-slot:header="props">
               <q-tr :props="props">
                 <q-th auto-width />

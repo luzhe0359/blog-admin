@@ -4,9 +4,10 @@ Vue.config.productionTip = false
 
 Vue.prototype.$url = process.env.URL
 Vue.prototype.$PUBLIC_PATH = process.env.VUE_ROUTER_BASE
+Vue.prototype.$PUBLIC_PATH = process.env.VUE_ROUTER_BASE
 
-// 浏览器 title
-Vue.prototype.$title = ' | ZUGELU'
+// logo(默认展位图图片)
+Vue.prototype.$BASE_IMG_URL = 'https://oss.zugelu.com/other/not_found.png'
 
 // 侧边栏风格
 Vue.prototype.$SildeBar = 'hHh lpR fFf' // 风格二：lHh lpR fFf

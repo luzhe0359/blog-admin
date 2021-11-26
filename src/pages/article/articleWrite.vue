@@ -72,27 +72,43 @@
           <label class="text-subtitle1 q-mr-md">状态</label>
           <q-select :class="$q.screen.lt.sm?'col':'select-width'" dense outlined emit-value map-options v-model="post.state" :options="typeOptions" />
         </div>
+        <!-- 文章封面 -->
+        <div class="full-width">
+          <label class="text-subtitle1 q-mr-md">封面</label>
+          <div class="row full-width">
+            <q-img alt="avatar" :src="post.imgCover" :placeholder-src="$BASE_IMG_URL" transition="slide-down" class="cursor-pointer" :ratio="16/9" width="50%">
+              <div class="absolute-bottom text-subtitle2 text-center" @click="uploadDialogVisible = true">
+                更换头像
+              </div>
+            </q-img>
+          </div>
+        </div>
         <div class="row full-width">
           <label class="text-subtitle1">描述</label>
           <q-input class="full-width" type="text" dense clearable v-model="post.desc" placeholder="请输入文章描述 ..." />
         </div>
       </template>
     </BaseDialog>
+    <!-- 头像上传 -->
+    <BaseDialog :title="'头像上传'" :hideAction="true" :dialogVisible="uploadDialogVisible" @okClick="uploadDialogVisible = false" @cancelClick="uploadDialogVisible = false">
+      <template v-slot:body>
+        <q-uploader :url="`${$url}/api/photo/upload?classify=article-cover`" :headers="[
+              {name: 'Authorization', value: `Bearer ${token}`}
+            ]" field-name='photo' max-files="1" style="width:100%; height: 500px;" @uploaded="finishUpload" />
+      </template>
+    </BaseDialog>
   </div>
 </template>
 
 <script>
-import BaseDialog from 'components/Dialog/BaseDialog.vue'
 import { uploadImage } from 'src/api/photo.js'
 import { addArticle, findArticleById, editArticleById } from 'src/api/article.js'
 import { findTagList } from 'src/api/tag.js'
 import { findCategoryList } from 'src/api/category.js'
+import { getToken } from 'src/utils/auth.js'
 
 export default {
   name: 'articleWrite',
-  components: {
-    BaseDialog
-  },
   data () {
     return {
       leftToolbar: 'undo redo clear | h bold italic strikethrough quote | ul ol table hr | link image code | todo-list',
@@ -101,6 +117,7 @@ export default {
         desc: '',
         mdContent: '',
         htmlContent: '',
+        imgCover: '', // 封面
         tags: [],
         category: [],
         type: 1, // 1:原创 | 2:转载
@@ -123,7 +140,9 @@ export default {
         { label: '草稿', value: 2 },
         { label: '垃圾箱', value: 3 }
       ],
-      id: '' // 编辑时的id
+      id: '', // 编辑时的id
+      uploadDialogVisible: false, // 上传封面dialog
+      token: getToken()
     }
   },
   created () {
@@ -132,6 +151,9 @@ export default {
     this.getCategoryList()
 
     this.id && this.getArticleById()
+  },
+  mounted () {
+    // this.$refs.upd.addFiles(['https://oss.zugelu.com/photo-1621921809589.jpg'])
   },
   watch: {
     // 标签对象，转为数组
@@ -158,16 +180,6 @@ export default {
     editorChange (value, render) {
       this.post.htmlContent = render
     },
-    // 添加图片
-    // handleUploadImage (pos, $file) {
-    //   // 第一步.将图片上传到服务器.
-    //   var formdata = new FormData()
-    //   formdata.append('file', $file)
-
-    //   uploadImage(formdata).then(res => {
-    //     this.$refs.md.$img2Url(pos, this.$url + res.data.url)
-    //   })
-    // },
     // 上传图片
     handleUploadImage (event, insertImage, files) {
       // 拿到 files 之后上传到文件服务器，然后向编辑框中插入对应的内容
@@ -175,10 +187,9 @@ export default {
       formdata.append('photo', files[0])
 
       uploadImage(formdata).then(res => {
-        // this.$refs.md.$img2Url(pos, this.$url + res.data.url)
         // md插入图片
         insertImage({
-          url: this.$url + res.data.url,
+          url: res.data.url,
           desc: res.data.name,
           width: '50%',
           height: '50%'
@@ -292,6 +303,17 @@ export default {
     removeCategory (name, v) {
       this.$delete(this.activeCategoryNames, name)
       this.$delete(this.activeCategoryIds, name)
+    },
+    // 上传图片事件
+    finishUpload (file) {
+      const res = JSON.parse(file.xhr.response)
+      if (res.code === 2000) {
+        this.$set(this.post, 'imgCover', res.data.url)
+        // 上传成功
+        this.$msg.success(res.msg)
+        // 然后隐藏对话框
+        this.uploadDialogVisible = false
+      }
     }
   }
 }
@@ -318,9 +340,6 @@ export default {
     opacity: 0.8;
     z-index: 999;
   }
-}
-.disable-scroll {
-  overflow: hidden;
 }
 .hover-mask {
   background-color: $grey-1;

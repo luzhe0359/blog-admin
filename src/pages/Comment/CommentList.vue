@@ -27,7 +27,8 @@
                 </span>
               </div>
             </template>
-            <!-- 表格内容 -扩展行插槽 -->
+            <!-- 表格内容 -->
+            <!-- 扩展行插槽 -->
             <template v-slot:header="props">
               <q-tr :props="props">
                 <q-th auto-width />
@@ -45,6 +46,7 @@
                 </q-td>
                 <q-td v-for="col in props.cols" :key="col.name" :props="props">
                   {{ col.value }}
+                  <q-tooltip max-width="500px">{{  col.value }}</q-tooltip>
                 </q-td>
                 <!-- 表体 操作列 -->
                 <q-td class="row justify-center items-center no-wrap">
@@ -61,7 +63,9 @@
                 <!-- 评论用户 -->
                 <q-td class="text-center"> {{ child.from.nickname }}</q-td>
                 <!-- 评论内容 -->
-                <q-td class="text-center">{{ child.content }} </q-td>
+                <q-td class="text-center">
+                  {{ child.content }} <q-tooltip>{{ child.content }}</q-tooltip>
+                </q-td>
                 <!-- 点赞数量 -->
                 <q-td class="text-center"> {{ child.likes.length}} </q-td>
                 <!-- 评论时间 -->
@@ -104,9 +108,9 @@ export default {
         rowsNumber: 10 // 总行数
       },
       commentColumns: [
-        { name: 'articleId', required: true, label: '文章', align: 'left', field: 'articleId', format: val => val.title },
+        { name: 'articleId', required: true, label: '文章', align: 'left', field: 'articleId', format: val => val && val.title },
         { name: 'from', label: '评论用户', field: 'from', align: 'center', sortable: true, format: val => val.nickname },
-        { name: 'content', label: '评论内容', field: 'content', align: 'center' },
+        { name: 'content', label: '评论内容', field: 'content', align: 'center', classes: 'ellipsis', style: 'max-width: 100px;' },
         { name: 'likes', label: '点赞数量', field: 'likes', align: 'center', sortable: true, format: val => val.length },
         { name: 'createTime', label: '评论时间', field: 'createTime', align: 'center', sortable: true, format: val => date.formatDate(val, 'YYYY-MM-DD HH:mm:ss') }
         // { name: 'action', label: '操作', field: 'action', align: 'center' }

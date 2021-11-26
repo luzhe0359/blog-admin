@@ -65,7 +65,6 @@ export default async ({ app, router, Vue, store }) => {
  */
 function handleTagViewAndBreadcrumbsAndKeepAlive (from, to, store, Vue) {
   if (to.name != null) {
-    document.title = to.meta.title + Vue.prototype.$title
     LoadingBar.start()
     // is a public route ?
     for (let i = 0; i < constantRoutes.length; i++) {

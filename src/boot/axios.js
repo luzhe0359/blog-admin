@@ -113,9 +113,9 @@ const errorHandle = (status, msg) => {
         case 2001:
             tip('账号已存在，请重新输入!')
             break
-        // 2002: 用户名/密码错误
+        // 2002: 账号/密码错误
         case 2002:
-            tip('用户名或密码错误!')
+            tip('账号或密码错误!')
             break
         // 2003: 用户名/密码错误
         case 2003:

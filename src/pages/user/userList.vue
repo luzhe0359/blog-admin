@@ -35,34 +35,25 @@
             <template v-slot:no-data="{ message }">
               <div class="full-width row flex-center q-gutter-sm text-warning">
                 <q-icon v-show="!loading" size="2em" name="sentiment_dissatisfied" />
-                <span>
-                  {{ message }}
-                </span>
+                <span>{{ message }}</span>
               </div>
             </template>
-            <!-- 表格内容 -性别插槽 -->
+            <!-- 表格内容 -->
+            <!-- 性别插槽 -->
             <template v-slot:body-cell-gender="props">
               <q-td :props="props">
                 {{props.row.gender | userGender}}
               </q-td>
             </template>
-            <!-- 表格内容 -头像插槽 -->
+            <!-- 头像插槽 -->
             <template v-slot:body-cell-avatar="props">
               <q-td :props="props">
-                <q-avatar round size="48px">
-                  <q-img no-default-spinner transition="slide-down" :src="`${$url}${props.row.avatar}`" :placeholder-src="'/images/logo.webp' | imgBaseUrl" />
+                <q-avatar round size="80px">
+                  <q-img no-default-spinner transition="slide-down" :src="props.row.avatar" :placeholder-src="$BASE_IMG_URL" />
                 </q-avatar>
               </q-td>
             </template>
-            <!-- 表格内容 -操作插槽 -->
-            <template v-slot:body-cell-action="props">
-              <q-td :props="props">
-                <q-btn v-if="hasBtnPermissions" icon="edit" size="sm" flat dense @click="editUser(props.row)" />
-                <q-btn v-if="hasBtnPermissions" icon="delete" size="sm" class="q-ml-sm" flat dense @click="deleteUser(props.row)" />
-                <q-btn v-if="!hasBtnPermissions" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
-              </q-td>
-            </template>
-            <!-- 表格内容 -简介插槽 -->
+            <!-- 简介插槽 -->
             <template v-slot:body-cell-about="props">
               <q-td :props="props">
                 <div class="fit flex flex-center text-center non-selectable q-pa-md">
@@ -73,11 +64,19 @@
                 </div>
               </q-td>
             </template>
+            <!-- 操作插槽 -->
+            <template v-slot:body-cell-action="props">
+              <q-td :props="props">
+                <q-btn v-if="hasBtnPermissions" icon="edit" size="sm" flat dense @click="editUser(props.row)" />
+                <q-btn v-if="hasBtnPermissions" icon="delete" size="sm" class="q-ml-sm" flat dense @click="deleteUser(props.row)" />
+                <q-btn v-if="!hasBtnPermissions" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
+              </q-td>
+            </template>
           </q-table>
         </q-card-section>
       </q-card>
       <!-- 新增用户 -->
-      <BaseDialog :title="'添加'" :dialogVisible="addDialogVisible" @okClick="onOKClick" @cancelClick="onCancelClick">
+      <BaseDialog :title="'添加用户'" :dialogVisible="addDialogVisible" @okClick="onOKClick" @cancelClick="onCancelClick">
         <template v-slot:body>
           <q-form ref="addRef" class="fit">
             <!-- 账号 -->
@@ -127,7 +126,7 @@
               <div class="text-subtitle1 q-mr-md ">头像</div>
               <div class="col">
                 <q-avatar size="100px">
-                  <q-img class="cursor-pointer" :src="uAvatar | imgBaseUrl" spinner-color="primary" width='100px' height='100px' :placeholder-src="'/images/logo.webp' | imgBaseUrl" @click="uploadDialogVisible = true">
+                  <q-img class="cursor-pointer" :src="uAvatar" spinner-color="primary" transition="slide-down" :placeholder-src="$BASE_IMG_URL" @click="uploadDialogVisible = true">
                     <div class="absolute-bottom text-subtitle2 text-center">
                       上传头像
                     </div>
@@ -139,9 +138,9 @@
         </template>
       </BaseDialog>
       <!-- 头像上传 -->
-      <BaseDialog :title="'头像上传'" :dialogVisible="uploadDialogVisible" :hideAction="true" @okClick="okUploadClick" @cancelClick="cancelUploadClick">
+      <BaseDialog :title="'头像上传'" :hideAction="true" :dialogVisible="uploadDialogVisible" @okClick="okUploadClick" @cancelClick="cancelUploadClick">
         <template v-slot:body>
-          <q-uploader :url="`${$url}/api/photo/upload`" :headers="[
+          <q-uploader :url="`${$url}/api/photo/upload?classify=avatar`" :headers="[
               {name: 'Authorization', value: `Bearer ${token}`}
             ]" field-name='photo' max-files="1" style="width:100%; height: 500px;" @uploaded="finishUpload" />
         </template>

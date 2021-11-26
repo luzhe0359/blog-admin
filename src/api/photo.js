@@ -22,7 +22,7 @@ export const findPhotoList = params => {
  * @param {Object} formdata 图片formdata
  */
 export const uploadImage = (params) => {
-    return axios.post('/photo/upload', params)
+    return axios.post('/photo/upload?classify=article-content', params)
 }
 
 /**
