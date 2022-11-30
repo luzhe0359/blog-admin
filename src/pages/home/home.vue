@@ -11,12 +11,16 @@
                   <q-icon color="yellow" name="trending_up" />
                 </div>
                 <div class="text-h6 q-mt-sm q-mb-xs text-white">
-                  <countTo :startVal='0' :endVal='count.total' :duration='1500' />
+                  <countTo
+                    :startVal="0"
+                    :endVal="count.articles"
+                    :duration="1500"
+                  />
                   条
                 </div>
               </q-card-section>
               <q-card-section class="col">
-                <div style="height: 100%;max-width: 150px">
+                <div style="height: 100%; max-width: 150px">
                   <v-chart :options="income" />
                 </div>
               </q-card-section>
@@ -30,12 +34,16 @@
                   <q-icon color="green" name="trending_down" />
                 </div>
                 <div class="text-h6 q-mt-sm q-mb-xs text-white">
-                  <countTo :startVal='0' :endVal='count.views' :duration='1500' />
+                  <countTo
+                    :startVal="0"
+                    :endVal="count.views"
+                    :duration="1500"
+                  />
                   次
                 </div>
               </q-card-section>
               <q-card-section class="col">
-                <div style="height: 100%;width: 150px">
+                <div style="height: 100%; width: 150px">
                   <v-chart :options="expense" />
                 </div>
               </q-card-section>
@@ -49,12 +57,16 @@
                   <q-icon color="yellow" name="trending_up" />
                 </div>
                 <div class="text-h6 q-mt-sm q-mb-xs text-white">
-                  <countTo :startVal='0' :endVal='count.likes' :duration='1500' />
+                  <countTo
+                    :startVal="0"
+                    :endVal="count.likes"
+                    :duration="1500"
+                  />
                   个
                 </div>
               </q-card-section>
               <q-card-section class="col">
-                <div style="height: 100%;width: 150px">
+                <div style="height: 100%; width: 150px">
                   <v-chart class="" :options="total" />
                 </div>
               </q-card-section>
@@ -62,14 +74,20 @@
           </q-card>
         </div>
         <div class="col-xs-12 col-md-9">
-          <q-card class="cimo-shadow col-11" style="height: 100%;min-height:390px;padding: 3px;">
+          <q-card
+            class="cimo-shadow col-11"
+            style="height: 100%; min-height: 390px; padding: 3px"
+          >
             <v-chart class="" :options="charts2Option" autoresize />
           </q-card>
         </div>
       </div>
       <div class="row q-col-gutter-md">
         <div class="col-xs-12 col-md-3">
-          <q-card class="cimo-shadow" style="height: 430px; width: 100%; padding: 3px">
+          <q-card
+            class="cimo-shadow"
+            style="height: 430px; width: 100%; padding: 3px"
+          >
             <v-chart class="" :options="categoryPie" autoresize />
           </q-card>
         </div>
@@ -78,18 +96,40 @@
             <q-img :src="this.$PUBLIC_PATH + 'data/front.webp'" />
             <q-card-section>
               <div class="text-h5 q-mt-sm q-mb-xs">Welcome My Friends！</div>
-              <div class="text-subtitle1">这是我的博客首页，怎么样，感觉还不错吧？点击下方链接去瞄一眼！</div>
+              <div class="text-subtitle1">
+                这是我的博客首页，怎么样，感觉还不错吧？点击下方链接去瞄一眼！
+              </div>
             </q-card-section>
             <q-card-actions>
               <q-space />
-              <q-btn icon="refresh" flat color="primary" label="足各路の博客" @click="toFront" />
+              <q-btn
+                icon="refresh"
+                flat
+                color="primary"
+                label="足各路の博客"
+                @click="toFront"
+              />
             </q-card-actions>
           </q-card>
         </div>
         <div class="col-xs-12 col-md-6">
-          <q-table class="cimo-shadow" :grid="$q.screen.xs" title="Treats" :data="data" :columns="columns" :filter="filter" row-key="name" style="height: 430px;">
+          <q-table
+            class="cimo-shadow"
+            :grid="$q.screen.xs"
+            title="Treats"
+            :data="data"
+            :columns="columns"
+            :filter="filter"
+            row-key="name"
+            style="height: 430px"
+          >
             <template v-slot:top-right>
-              <q-input dense debounce="300" v-model="filter" placeholder="Search">
+              <q-input
+                dense
+                debounce="300"
+                v-model="filter"
+                placeholder="Search"
+              >
                 <template v-slot:append>
                   <q-icon name="search" />
                 </template>
@@ -98,11 +138,18 @@
             <template v-slot:body="props">
               <q-tr :props="props">
                 <q-td key="name" :props="props">{{ props.row.name }}</q-td>
-                <q-td key="calories" :props="props">{{ props.row.calories }}</q-td>
+                <q-td key="calories" :props="props">{{
+                  props.row.calories
+                }}</q-td>
                 <q-td key="fat" :props="props">{{ props.row.fat }}</q-td>
                 <q-td key="carbs" :props="props">{{ props.row.carbs }}</q-td>
                 <q-td key="operating" :props="props">
-                  <q-btn class="btn-table text-white" icon="tune" label="详情" @click="handleTableClick(props.row)" />
+                  <q-btn
+                    class="btn-table text-white"
+                    icon="tune"
+                    label="详情"
+                    @click="handleTableClick(props.row)"
+                  />
                 </q-td>
               </q-tr>
             </template>
@@ -111,7 +158,6 @@
       </div>
     </div>
   </base-content>
-
 </template>
 
 <script>
@@ -133,7 +179,7 @@ export default {
     return {
       expanded: false,
       chartPie,
-      categoryPie: null,
+      categoryPie: category,
       chartZ,
       charts2Option,
       income,
@@ -252,12 +298,14 @@ export default {
     handleCountArticle () {
       countArticle().then((res) => {
         this.count = res.data
-        category.series[0].data = res.data.categorys.map(c => {
+        category.series[0].data = res.data.catePie.map(c => {
           return {
             name: c.name, value: c.count
           }
         }).sort((a, b) => { return a.value - b.value })
-        this.categoryPie = category
+        console.log(category)
+        // this.categoryPie = res.data.catePie
+        // category.series[0].data = this.data
         //         comments: 2
         // likes: 7
         // total: 6

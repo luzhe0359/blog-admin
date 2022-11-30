@@ -2,12 +2,27 @@
   <BaseContent>
     <div class="q-pa-md">
       <!-- 主体 -->
-      <q-card :bordered="false" style="box-shadow: none;">
+      <q-card :bordered="false" style="box-shadow: none">
         <!-- 搜索框 -->
         <q-card-section class="q-px-none q-py-sm">
-          <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-sm row items-end">
-            <q-input type="text" v-model="content" label="评论内容" class="col-lg-3 col-md-3 col-sm-6 col-xs-10" />
-            <q-btn label="查 询" type="submit" color="primary" :disable="searchLoading" :loading="searchLoading">
+          <q-form
+            @submit="onSubmit"
+            @reset="onReset"
+            class="q-gutter-sm row items-end"
+          >
+            <q-input
+              type="text"
+              v-model="content"
+              label="评论内容"
+              class="col-lg-3 col-md-3 col-sm-6 col-xs-10"
+            />
+            <q-btn
+              label="查 询"
+              type="submit"
+              color="primary"
+              :disable="searchLoading"
+              :loading="searchLoading"
+            >
               <template v-slot:loading>
                 <q-spinner-facebook />
               </template>
@@ -17,11 +32,33 @@
         </q-card-section>
         <!-- 表格 -->
         <q-card-section class="q-pa-none">
-          <q-table color="primary" :bordered="false" card-style="box-shadow: none;" row-key="_id" :data="commentData" :columns="commentColumns" :loading="loading" :pagination.sync="pagination" rows-per-page-label="每页条数:" :rows-per-page-options="[5, 10, 20, 50, 0]" :pagination-label="(firstRowIndex, endRowIndex, totalRowsNumber) => `${firstRowIndex}-${endRowIndex} / ${totalRowsNumber}`" no-data-label="很抱歉, 没有查询到您想要的结果 . . ." @request="request" binary-state-sort>
+          <q-table
+            color="primary"
+            :bordered="false"
+            card-style="box-shadow: none;"
+            row-key="_id"
+            :data="commentData"
+            :columns="commentColumns"
+            :loading="loading"
+            :pagination.sync="pagination"
+            rows-per-page-label="每页条数:"
+            :rows-per-page-options="[5, 10, 20, 50, 0]"
+            :pagination-label="
+              (firstRowIndex, endRowIndex, totalRowsNumber) =>
+                `${firstRowIndex}-${endRowIndex} / ${totalRowsNumber}`
+            "
+            no-data-label="很抱歉, 没有查询到您想要的结果 . . ."
+            @request="request"
+            binary-state-sort
+          >
             <!-- 无数据 -插槽 -->
             <template v-slot:no-data="{ message }">
               <div class="full-width row flex-center q-gutter-sm text-warning">
-                <q-icon v-show="!loading" size="2em" name="sentiment_dissatisfied" />
+                <q-icon
+                  v-show="!loading"
+                  size="2em"
+                  name="sentiment_dissatisfied"
+                />
                 <span>
                   {{ message }}
                 </span>
@@ -42,21 +79,54 @@
             <template v-slot:body="props">
               <q-tr :props="props">
                 <q-td>
-                  <q-btn v-if="props.row.otherComments.length > 0" size="sm" color="primary" round flat dense @click="props.expand = !props.expand" :icon="props.expand ? 'remove' : 'add'" />
+                  <q-btn
+                    v-if="props.row.otherComments.length > 0"
+                    size="sm"
+                    color="primary"
+                    round
+                    flat
+                    dense
+                    @click="props.expand = !props.expand"
+                    :icon="props.expand ? 'remove' : 'add'"
+                  />
                 </q-td>
                 <q-td v-for="col in props.cols" :key="col.name" :props="props">
                   {{ col.value }}
-                  <q-tooltip max-width="500px">{{  col.value }}</q-tooltip>
+                  <q-tooltip max-width="500px">{{ col.value }}</q-tooltip>
                 </q-td>
                 <!-- 表体 操作列 -->
                 <q-td class="row justify-center items-center no-wrap">
-                  <CommentState v-if="hasBtnPermissions" :state="props.row.state" @stateChange="changeState($event, props.row)" />
-                  <q-btn v-if="hasBtnPermissions" icon="delete" size="sm" flat dense @click="deleteComment(props.row._id)" />
-                  <q-btn v-if="!hasBtnPermissions" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
+                  <CommentState
+                    v-if="hasBtnPermissions"
+                    :state="props.row.state"
+                    @stateChange="changeState($event, props.row)"
+                  />
+                  <q-btn
+                    v-if="hasBtnPermissions"
+                    icon="delete"
+                    size="sm"
+                    flat
+                    dense
+                    @click="deleteComment(props.row._id)"
+                  />
+                  <q-btn
+                    v-if="!hasBtnPermissions"
+                    icon="person_off"
+                    size="sm"
+                    class="q-ml-sm"
+                    flat
+                    dense
+                    @click="noPermission"
+                  />
                 </q-td>
               </q-tr>
               <!-- 子评论 -->
-              <q-tr v-show="props.expand" :props="props" v-for="child in props.row.otherComments" :key="child._id">
+              <q-tr
+                v-show="props.expand"
+                :props="props"
+                v-for="child in props.row.otherComments"
+                :key="child._id"
+              >
                 <q-td></q-td>
                 <!-- 标题 -->
                 <q-td></q-td>
@@ -67,14 +137,35 @@
                   {{ child.content }} <q-tooltip>{{ child.content }}</q-tooltip>
                 </q-td>
                 <!-- 点赞数量 -->
-                <q-td class="text-center"> {{ child.likes.length}} </q-td>
+                <q-td class="text-center"> {{ child.likes.length }} </q-td>
                 <!-- 评论时间 -->
-                <q-td class="text-center"> {{ child.createTime | dateFormat }} </q-td>
+                <q-td class="text-center">
+                  {{ child.createTime | dateFormat }}
+                </q-td>
                 <!-- 操作 -->
                 <q-td class="row justify-center items-center no-wrap">
-                  <CommentState v-if="hasBtnPermissions" :state="child.state" @stateChange="changeState($event, props.row, child._id)" />
-                  <q-btn v-if="hasBtnPermissions" icon="delete" size="sm" flat dense @click="$q.notify('请删除上级评论 .')" />
-                  <q-btn v-if="!hasBtnPermissions" icon="person_off" size="sm" class="q-ml-sm" flat dense @click="noPermission" />
+                  <CommentState
+                    v-if="hasBtnPermissions"
+                    :state="child.state"
+                    @stateChange="changeState($event, props.row, child._id)"
+                  />
+                  <q-btn
+                    v-if="hasBtnPermissions"
+                    icon="delete"
+                    size="sm"
+                    flat
+                    dense
+                    @click="$q.notify('请删除上级评论 .')"
+                  />
+                  <q-btn
+                    v-if="!hasBtnPermissions"
+                    icon="person_off"
+                    size="sm"
+                    class="q-ml-sm"
+                    flat
+                    dense
+                    @click="noPermission"
+                  />
                 </q-td>
               </q-tr>
             </template>
@@ -140,6 +231,7 @@ export default {
         pageNum: page,
         pageSize: rowsPerPage,
         sortBy: sortBy,
+        type: 1, // 文章
         descending: descending ? 1 : -1
       }
       findCommentList(params).then(res => {

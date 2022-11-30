@@ -14,7 +14,7 @@ import { axios } from 'boot/axios.js'
  * @param {String} descending 1升序/-1降序
  */
 export const findMessageList = params => {
-    return axios.get('/message/list', { params })
+  return axios.get('/comment/list', { params })
 }
 
 /**
@@ -22,7 +22,7 @@ export const findMessageList = params => {
  * @param {String} _id 父留言_id
  */
 export const deleteMessageById = _id => {
-    return axios.delete(`/message/${_id}`)
+  return axios.delete(`/comment/${_id}`)
 }
 
 /**
@@ -32,5 +32,5 @@ export const deleteMessageById = _id => {
  * @param {ObjectId} otherCommentId 子留言_id
  */
 export const changeMessageState = (_id, params) => {
-    return axios.put(`/message/state/${_id}`, params)
+  return axios.put(`/comment/state/${_id}`, params)
 }
